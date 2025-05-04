@@ -51,6 +51,10 @@ body {
     display: flex;
     flex-direction: column;
     text-align: center;
+    height:auto;
+    overflow:visible;
+    white-space: normal;
+    word-wrap: break-word;
 
     img {
         max-width: 100%;
