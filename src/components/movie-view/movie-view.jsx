@@ -1,4 +1,3 @@
-// src/components/movie-view/movie-view.jsx
 import React from "react";
 
 export const MovieView = ({ movie, onBackClick }) => {

@@ -1,4 +1,3 @@
-// src/components/movie-card/movie-card.jsx
 import React from "react";
 
 export const MovieCard = ({ movie, onMovieClick }) => {
