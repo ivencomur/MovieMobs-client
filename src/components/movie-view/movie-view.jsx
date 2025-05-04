@@ -1,10 +1,25 @@
 import React from "react";
 
 export const MovieView = ({ movie, onBackClick }) => {
+  const handleImageError = (e) => {
+    if (movie.FallbackImagePath && e.target.src !== movie.FallbackImagePath) {
+      e.target.onerror = null; 
+      e.target.src = movie.FallbackImagePath;
+    } else {
+      
+      e.target.src = '/path/to/generic/placeholder.jpg';
+    }
+  };
+
   return (
     <div className="movie-view">
       <div>
-        <img className="movie-poster" src={movie.ImagePath} alt={`Poster for ${movie.Title}`} />
+        <img
+          className="movie-poster"
+          src={movie.ImagePath}
+          alt={`Poster for ${movie.Title}`}
+          onError={handleImageError}
+         />
       </div>
       <div className="movie-details">
         <div className="movie-detail">
@@ -23,7 +38,7 @@ export const MovieView = ({ movie, onBackClick }) => {
             <span>Director: </span>
             <span>{movie.Director?.Name}</span>
         </div>
-        <div className="movie-detail">
+       <div className="movie-detail">
             <span>Director Bio: </span>
             <span>{movie.Director?.Bio}</span>
         </div>
