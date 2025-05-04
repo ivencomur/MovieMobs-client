@@ -72,7 +72,7 @@ body {
         display: -webkit-box;
         -webkit-box-orient: vertical;
         -webkit-line-clamp: 2; /* Webkit browsers */
-        line-clamp: 2;         /* Standard property */
+        line-clamp: 2;         /* Standard property - Fixes the warning */
     }
 
     &:hover {
