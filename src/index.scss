@@ -72,7 +72,7 @@ body {
         font-family: 'Moderustic', sans-serif;
         min-height: 2.4em;
         line-height: 1.2em;
-        overflow: hidden;
+        overflow-y: auto;
         display: -webkit-box;
         -webkit-box-orient: vertical;
         -webkit-line-clamp: 2; /* Webkit browsers */
