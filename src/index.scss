@@ -68,10 +68,11 @@ body {
         font-family: 'Moderustic', cursive;
         min-height: 2.4em;
         line-height: 1.2em;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
         overflow: hidden;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2; /* Webkit browsers */
+        line-clamp: 2;         /* Standard property */
     }
 
     &:hover {
