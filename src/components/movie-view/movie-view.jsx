@@ -3,11 +3,8 @@ import React from "react";
 export const MovieView = ({ movie, onBackClick }) => {
   const handleImageError = (e) => {
     if (movie.FallbackImagePath && e.target.src !== movie.FallbackImagePath) {
-      e.target.onerror = null; 
+      e.target.onerror = null;
       e.target.src = movie.FallbackImagePath;
-    } else {
-      
-      e.target.src = '/path/to/generic/placeholder.jpg';
     }
   };
 
@@ -38,7 +35,7 @@ export const MovieView = ({ movie, onBackClick }) => {
             <span>Director: </span>
             <span>{movie.Director?.Name}</span>
         </div>
-       <div className="movie-detail">
+        <div className="movie-detail">
             <span>Director Bio: </span>
             <span>{movie.Director?.Bio}</span>
         </div>
