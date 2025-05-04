@@ -1,9 +1,13 @@
 import { createRoot } from 'react-dom/client';
-import { MainView } from './components/main-view/main-view';
+import MainView from './components/main-view/main-view';
 import "./index.scss";
 
 const MovieMobsApplication = () => {
-  return <MainView />;
+  return (
+    <div className="movie-mobs-app">
+       <MainView />
+    </div>
+  );
 };
 
 const container = document.querySelector("#root");
