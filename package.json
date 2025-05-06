@@ -14,11 +14,12 @@
   "author": "",
   "type": "commonjs",
   "scripts": {
-    "start": "parcel src/index.html", 
+    "start": "parcel src/index.html",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
     "-": "^0.0.1",
+    "prop-types": "^15.8.1",
     "react": "^19.1.0",
     "react-dom": "^19.1.0"
   },

@@ -1,12 +1,24 @@
 import React from "react";
+import PropTypes from 'prop-types';
 
 export const MovieView = ({ movie, onBackClick }) => {
   const handleImageError = (e) => {
     if (movie.FallbackImagePath && e.target.src !== movie.FallbackImagePath) {
       e.target.onerror = null;
       e.target.src = movie.FallbackImagePath;
+    } else if (!movie.FallbackImagePath) {
+      e.target.onerror = null;
     }
   };
+
+  if (!movie) {
+    return (
+      <div>
+        <p>We´re sorry, the movie data is not available.</p>
+        <button className="back-button" onClick={onBackClick}>Back</button>
+      </div>
+    );
+  }
 
   return (
     <div className="movie-view">
@@ -29,15 +41,15 @@ export const MovieView = ({ movie, onBackClick }) => {
         </div>
         <div className="movie-detail">
             <span>Genre: </span>
-            <span>{movie.Genre?.Name}</span>
+            <span>{movie.Genre?.Name || 'N/A'}</span>
         </div>
         <div className="movie-detail">
             <span>Director: </span>
-            <span>{movie.Director?.Name}</span>
+            <span>{movie.Director?.Name || 'N/A'}</span>
         </div>
        <div className="movie-detail">
             <span>Director Bio: </span>
-            <span>{movie.Director?.Bio}</span>
+            <span>{movie.Director?.Bio || 'N/A'}</span>
         </div>
         <div className="movie-detail">
             <span>Featured: </span>
@@ -59,4 +71,24 @@ export const MovieView = ({ movie, onBackClick }) => {
       <button className="back-button" onClick={onBackClick}>Back</button>
     </div>
   );
+};
+
+MovieView.propTypes = {
+  movie: PropTypes.shape({
+    _id: PropTypes.string.isRequired,
+    Title: PropTypes.string.isRequired,
+    Description: PropTypes.string.isRequired,
+    ImagePath: PropTypes.string.isRequired,
+    FallbackImagePath: PropTypes.string,
+    Genre: PropTypes.shape({
+      Name: PropTypes.string
+    }),
+    Director: PropTypes.shape({
+      Name: PropTypes.string,
+      Bio: PropTypes.string
+    }),
+    Featured: PropTypes.bool,
+    Cast: PropTypes.arrayOf(PropTypes.string)
+  }).isRequired,
+  onBackClick: PropTypes.func.isRequired
 };
