@@ -9,7 +9,7 @@ const MainView = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const apiUrl = "https://iecm-movies-app-6966360ed90e.herokuapp.com";
+    const apiUrl = "https://iecm-movies-app-6966360ed90e.herokuapp.com/movies";
 
     setError(null);
 
@@ -57,7 +57,7 @@ const MainView = () => {
   };
 
   if (loading) {
-    return <div className="loading-message">Loading movies... Please wait.</div>;
+    return <div className="loading-message"> We are loading the movies... Please wait.</div>;
   }
 
   if (error) {
