@@ -9,7 +9,7 @@ const MainView = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const apiUrl = 'https://iecm-movies-app-6966360ed90e.herokuapp.com';
+    const apiUrl = "https://iecm-movies-app-6966360ed90e.herokuapp.com";
 
     setError(null);
 
