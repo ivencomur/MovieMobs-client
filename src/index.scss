@@ -51,10 +51,6 @@ body {
     display: flex;
     flex-direction: column;
     text-align: center;
-    height:auto;
-    overflow:visible;
-    white-space: normal;
-    word-wrap: break-word;
 
     img {
         max-width: 100%;
@@ -69,14 +65,14 @@ body {
         font-size: 1.1rem;
         color: $primary-color;
         margin: 0;
-        font-family: 'Moderustic', sans-serif;
+        font-family: 'Moderustic', cursive;
         min-height: 2.4em;
         line-height: 1.2em;
-        overflow-y: auto;
+        overflow: hidden;
         display: -webkit-box;
         -webkit-box-orient: vertical;
-        -webkit-line-clamp: 2; /* Webkit browsers */
-        line-clamp: 2;         /* Standard property - Fixes the warning */
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
     }
 
     &:hover {
