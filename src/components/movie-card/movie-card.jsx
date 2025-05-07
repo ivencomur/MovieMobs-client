@@ -1,5 +1,5 @@
 import React from "react";
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 
 export const MovieCard = ({ movie, onMovieClick }) => {
   const handleImageError = (e) => {
@@ -32,8 +32,8 @@ MovieCard.propTypes = {
   movie: PropTypes.shape({
     _id: PropTypes.string.isRequired,
     Title: PropTypes.string.isRequired,
-    ImagePath: PropTypes.string.isRequired,
+    ImagePath: PropTypes.string,
     FallbackImagePath: PropTypes.string,
   }).isRequired,
-  onMovieClick: PropTypes.func.isRequired
+  onMovieClick: PropTypes.func.isRequired,
 };

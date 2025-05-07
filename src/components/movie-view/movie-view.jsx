@@ -1,5 +1,5 @@
 import React from "react";
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 
 export const MovieView = ({ movie, onBackClick }) => {
   const handleImageError = (e) => {
@@ -14,8 +14,10 @@ export const MovieView = ({ movie, onBackClick }) => {
   if (!movie) {
     return (
       <div>
-        <p>We´re sorry, the movie data is not available.</p>
-        <button className="back-button" onClick={onBackClick}>Back</button>
+        <p>Movie data not available.</p>
+        <button className="back-button" onClick={onBackClick}>
+          Back
+        </button>
       </div>
     );
   }
@@ -28,47 +30,49 @@ export const MovieView = ({ movie, onBackClick }) => {
           src={movie.ImagePath}
           alt={`Poster for ${movie.Title}`}
           onError={handleImageError}
-         />
+        />
       </div>
       <div className="movie-details">
         <div className="movie-detail">
-            <span>Title: </span>
-            <span>{movie.Title}</span>
+          <span>Title: </span>
+          <span>{movie.Title}</span>
         </div>
         <div className="movie-detail">
-            <span>Description: </span>
-            <span>{movie.Description}</span>
+          <span>Description: </span>
+          <span>{movie.Description}</span>
         </div>
         <div className="movie-detail">
-            <span>Genre: </span>
-            <span>{movie.Genre?.Name || 'N/A'}</span>
+          <span>Genre: </span>
+          <span>{movie.Genre?.name || "N/A"}</span>
         </div>
         <div className="movie-detail">
-            <span>Director: </span>
-            <span>{movie.Director?.Name || 'N/A'}</span>
-        </div>
-       <div className="movie-detail">
-            <span>Director Bio: </span>
-            <span>{movie.Director?.Bio || 'N/A'}</span>
+          <span>Director: </span>
+          <span>{movie.Director?.name || "N/A"}</span>
         </div>
         <div className="movie-detail">
-            <span>Featured: </span>
-            <span>{movie.Featured ? "Yes" : "No"}</span>
+          <span>Director Bio: </span>
+          <span>{movie.Director?.bio || "N/A"}</span>
         </div>
         <div className="movie-detail">
-            <span>Cast: </span>
-            {Array.isArray(movie.Cast) && movie.Cast.length > 0 ? (
-                 <ul className="cast-list">
-                    {movie.Cast.map((actor, index) => (
-                        <li key={index}>{actor}</li>
-                    ))}
-                </ul>
-            ) : (
-                <span>N/A</span>
-            )}
+          <span>Featured: </span>
+          <span>{movie.Featured ? "Yes" : "No"}</span>
+        </div>
+        <div className="movie-detail">
+          <span>Cast: </span>
+          {Array.isArray(movie.Cast) && movie.Cast.length > 0 ? (
+            <ul className="cast-list">
+              {movie.Cast.map((actorName, index) => (
+                <li key={index}>{actorName}</li>
+              ))}
+            </ul>
+          ) : (
+            <span>N/A</span>
+          )}
         </div>
       </div>
-      <button className="back-button" onClick={onBackClick}>Back</button>
+      <button className="back-button" onClick={onBackClick}>
+        Back
+      </button>
     </div>
   );
 };
@@ -78,17 +82,18 @@ MovieView.propTypes = {
     _id: PropTypes.string.isRequired,
     Title: PropTypes.string.isRequired,
     Description: PropTypes.string.isRequired,
-    ImagePath: PropTypes.string.isRequired,
+    ImagePath: PropTypes.string,
     FallbackImagePath: PropTypes.string,
     Genre: PropTypes.shape({
-      Name: PropTypes.string
+      name: PropTypes.string,
+      description: PropTypes.string,
     }),
     Director: PropTypes.shape({
-      Name: PropTypes.string,
-      Bio: PropTypes.string
+      name: PropTypes.string,
+      bio: PropTypes.string,
     }),
     Featured: PropTypes.bool,
-    Cast: PropTypes.arrayOf(PropTypes.string)
+    Cast: PropTypes.arrayOf(PropTypes.string),
   }).isRequired,
-  onBackClick: PropTypes.func.isRequired
+  onBackClick: PropTypes.func.isRequired,
 };
