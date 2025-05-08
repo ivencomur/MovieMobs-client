@@ -4,8 +4,12 @@ import PropTypes from "prop-types";
 export const MovieCard = ({ movie, onMovieClick }) => {
   const handleImageError = (e) => {
     if (movie.FallbackImagePath && e.target.src !== movie.FallbackImagePath) {
+      console.warn(`Image failed for ${movie.Title}, using fallback.`);
       e.target.onerror = null;
       e.target.src = movie.FallbackImagePath;
+    } else {
+       console.error(`Image failed for ${movie.Title}, no fallback available.`);
+       e.target.style.display = 'none';
     }
   };
 

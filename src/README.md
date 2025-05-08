@@ -37,3 +37,27 @@ This project uses Parcel v2.
 * Add routing to handle different views (Login, Signup, Profile, Movie).
 * Refine styling further based on specific design requirements.
 * Implement features for users to manage favorite movies.
+
+# MovieMobs Client (React Frontend)
+
+This is the React frontend for the MovieMobs application, allowing users to browse movies.
+
+## Current Features
+
+* Fetches movie data from the MovieMobs API on load (requires backend to be running and user login).
+* Displays a list of movies in a responsive grid layout.
+* Handles user login via the API.
+* Allows clicking on a movie card to view details (Title, Description, Image, Genre, Director, Cast, Featured Status).
+* Allows navigating back from the detail view to the list view.
+* Implements `MainView` using default export/import.
+* Uses SCSS for styling.
+
+## Environment Variables
+
+This project uses environment variables for configuration. You need to create a `.env` file in the root of the `MovieMobs-client` directory.
+
+**Example `.env` file:**
+
+```dotenv
+# URL of your running MovieMobs backend API
+PARCEL_API_URL=https://iecm-movies-app-6966360ed90e.herokuapp.com/documentation.html

@@ -4,17 +4,21 @@ import PropTypes from "prop-types";
 export const MovieView = ({ movie, onBackClick }) => {
   const handleImageError = (e) => {
     if (movie.FallbackImagePath && e.target.src !== movie.FallbackImagePath) {
+      console.warn(`Image failed for ${movie.Title} view, using fallback.`);
       e.target.onerror = null;
       e.target.src = movie.FallbackImagePath;
     } else if (!movie.FallbackImagePath) {
-      e.target.onerror = null;
+      console.error(
+        `Image failed for ${movie.Title} view, no fallback available.`
+      );
+      e.target.style.display = "none";
     }
   };
 
   if (!movie) {
     return (
       <div>
-        <p>Movie data not available.</p>
+        <p>Loading movie data...</p>
         <button className="back-button" onClick={onBackClick}>
           Back
         </button>
@@ -61,8 +65,8 @@ export const MovieView = ({ movie, onBackClick }) => {
           <span>Cast: </span>
           {Array.isArray(movie.Cast) && movie.Cast.length > 0 ? (
             <ul className="cast-list">
-              {movie.Cast.map((actorName, index) => (
-                <li key={index}>{actorName}</li>
+              {movie.Cast.map((actorName) => (
+                <li key={actorName}>{actorName || "N/A"}</li>
               ))}
             </ul>
           ) : (
@@ -86,7 +90,6 @@ MovieView.propTypes = {
     FallbackImagePath: PropTypes.string,
     Genre: PropTypes.shape({
       name: PropTypes.string,
-      description: PropTypes.string,
     }),
     Director: PropTypes.shape({
       name: PropTypes.string,
