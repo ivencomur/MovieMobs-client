@@ -44,8 +44,8 @@ const MainView = () => {
         );
       }
     } catch (err) {
-      console.error("Login error:", err.message || err); // Log the specific message if available
-      setError(err.message || "An unexpected login error occurred."); // Show a user-friendly message
+      console.error("Login error:", err.message || err); 
+      setError(err.message || "An unexpected login error occurred."); 
       localStorage.removeItem("token");
       setToken(null);
       setUser(null);
