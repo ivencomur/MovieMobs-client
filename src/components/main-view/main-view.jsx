@@ -44,8 +44,8 @@ const MainView = () => {
         );
       }
     } catch (err) {
-      console.error("Login error:", err);
-      setError(err.message);
+      console.error("Login error:", err.message || err); // Log the specific message if available
+      setError(err.message || "An unexpected login error occurred."); // Show a user-friendly message
       localStorage.removeItem("token");
       setToken(null);
       setUser(null);
@@ -98,28 +98,55 @@ const MainView = () => {
       })
       .then((data) => {
         const moviesFromApi = data.map((movie) => {
+          // Ensure director and genre are objects before accessing their properties
+          const directorName =
+            movie.director && typeof movie.director === "object"
+              ? movie.director.name
+              : "N/A";
+          const directorBio =
+            movie.director && typeof movie.director === "object"
+              ? movie.director.bio
+              : "N/A";
+          const genreName =
+            movie.genre && typeof movie.genre === "object"
+              ? movie.genre.name
+              : "N/A";
+
           return {
             _id: movie._id,
             Title: movie.title,
             Description: movie.description,
-            Genre: movie.genre,
-            Director: movie.director,
+            Genre: {
+              // Keep Genre as an object for MovieView prop consistency
+              name: genreName,
+            },
+            Director: {
+              // Keep Director as an object
+              name: directorName,
+              bio: directorBio, // Include bio if needed by MovieView
+            },
             ImagePath: movie.imagePath,
-            FallbackImagePath: null,
+            FallbackImagePath: null, // Define if you have fallback logic
             Featured: movie.featured || false,
-            Cast: movie.actors ? movie.actors.map((actor) => actor.name) : [],
+            Cast:
+              movie.actors && Array.isArray(movie.actors)
+                ? movie.actors.map((actor) =>
+                    actor && actor.name ? actor.name : "N/A"
+                  )
+                : [],
           };
         });
         setMovies(moviesFromApi);
       })
       .catch((err) => {
         console.error("Failed to fetch movies (full error object):", err);
-        setError(err.message);
+        // More specific error logging for fetch errors
+        setError(err.message || "Failed to load movies.");
       })
       .finally(() => {
         setLoading(false);
       });
-  }, [token, user]);
+  }, [token, user]); // Removed handleLogout from dependency array as it doesn't change
 
   const handleMovieClick = (clickedMovie) => {
     setSelectedMovie(clickedMovie);
@@ -129,6 +156,7 @@ const MainView = () => {
     setSelectedMovie(null);
   };
 
+  // --- Login View ---
   if (!token) {
     return (
       <div
@@ -191,18 +219,18 @@ const MainView = () => {
     );
   }
 
+  // --- Loading Movies View ---
   if (loading && movies.length === 0) {
     return (
       <div>
         <button
           onClick={handleLogout}
           className="logout-button"
-          style={{
-            position: "absolute",
-            top: "10px",
-            right: "10px",
-            padding: "8px 15px",
-          }}
+          style={
+            {
+              /* Consider consistent logout button placement */
+            }
+          }
         >
           Logout
         </button>
@@ -213,41 +241,41 @@ const MainView = () => {
     );
   }
 
+  // --- Error Fetching Movies View ---
   if (error) {
     return (
       <div>
         <button
           onClick={handleLogout}
           className="logout-button"
-          style={{
-            position: "absolute",
-            top: "10px",
-            right: "10px",
-            padding: "8px 15px",
-          }}
+          style={
+            {
+              /* Consider consistent logout button placement */
+            }
+          }
         >
           Logout
         </button>
         <div className="empty-list-message">
           There was an error fetching the movies: {error}. Please try again
-          later.
+          later or contact support.
         </div>
       </div>
     );
   }
 
+  // --- Movie Details View ---
   if (selectedMovie) {
     return (
       <div>
         <button
           onClick={handleLogout}
           className="logout-button"
-          style={{
-            marginBottom: "10px",
-            display: "block",
-            marginLeft: "auto",
-            marginRight: "auto",
-          }}
+          style={
+            {
+              /* Consistent placement */
+            }
+          }
         >
           Logout
         </button>
@@ -256,18 +284,18 @@ const MainView = () => {
     );
   }
 
+  // --- No Movies Available View ---
   if (movies.length === 0) {
     return (
       <div>
         <button
           onClick={handleLogout}
           className="logout-button"
-          style={{
-            position: "absolute",
-            top: "10px",
-            right: "10px",
-            padding: "8px 15px",
-          }}
+          style={
+            {
+              /* Consistent placement */
+            }
+          }
         >
           Logout
         </button>
@@ -281,24 +309,23 @@ const MainView = () => {
     );
   }
 
+  // --- Main Movies List View ---
   return (
     <div>
       <button
         onClick={handleLogout}
         className="logout-button"
-        style={{
-          marginBottom: "20px",
-          display: "block",
-          marginLeft: "auto",
-          marginRight: "auto",
-          padding: "10px 20px",
-        }}
+        style={
+          {
+            /* Consistent placement */
+          }
+        }
       >
         Logout
       </button>
       {user && (
         <h2 style={{ textAlign: "center", marginBottom: "20px" }}>
-          Welcome, {user.username}! let´s explore our movies!:
+          Welcome, {user.username}! Let's explore our movies:
         </h2>
       )}
       <div className="movies-list">
