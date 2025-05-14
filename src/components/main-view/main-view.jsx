@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { MovieCard } from "../movie-card/movie-card";
 import { MovieView } from "../movie-view/movie-view";
+import { LoginView } from "../login-view/login-view";
 
-const MainView = () => {
+export const MainView = () => {
   const [movies, setMovies] = useState([]);
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -10,6 +11,11 @@ const MainView = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
+
+  if (!user) {
+    return <LoginView onLoggedIn={(user) => setUser(user)} />;
+  }
+
   const [token, setToken] = useState(localStorage.getItem("token") || null);
 
   const handleLogin = async (event) => {
@@ -44,8 +50,8 @@ const MainView = () => {
         );
       }
     } catch (err) {
-      console.error("Login error:", err.message || err); 
-      setError(err.message || "An unexpected login error occurred."); 
+      console.error("Login error:", err.message || err);
+      setError(err.message || "An unexpected login error occurred.");
       localStorage.removeItem("token");
       setToken(null);
       setUser(null);
@@ -63,6 +69,7 @@ const MainView = () => {
     setError(null);
   };
 
+  //when the page loads check for token and user if not exists load the movies from api
   useEffect(() => {
     if (!token) {
       setLoading(false);
@@ -98,7 +105,6 @@ const MainView = () => {
       })
       .then((data) => {
         const moviesFromApi = data.map((movie) => {
-          // Ensure director and genre are objects before accessing their properties
           const directorName =
             movie.director && typeof movie.director === "object"
               ? movie.director.name
@@ -117,16 +123,14 @@ const MainView = () => {
             Title: movie.title,
             Description: movie.description,
             Genre: {
-              // Keep Genre as an object for MovieView prop consistency
               name: genreName,
             },
             Director: {
-              // Keep Director as an object
               name: directorName,
-              bio: directorBio, // Include bio if needed by MovieView
+              bio: directorBio,
             },
             ImagePath: movie.imagePath,
-            FallbackImagePath: null, // Define if you have fallback logic
+            FallbackImagePath: null,
             Featured: movie.featured || false,
             Cast:
               movie.actors && Array.isArray(movie.actors)
@@ -140,13 +144,13 @@ const MainView = () => {
       })
       .catch((err) => {
         console.error("Failed to fetch movies (full error object):", err);
-        // More specific error logging for fetch errors
+
         setError(err.message || "Failed to load movies.");
       })
       .finally(() => {
         setLoading(false);
       });
-  }, [token, user]); // Removed handleLogout from dependency array as it doesn't change
+  }, [token, user]);
 
   const handleMovieClick = (clickedMovie) => {
     setSelectedMovie(clickedMovie);
@@ -223,15 +227,7 @@ const MainView = () => {
   if (loading && movies.length === 0) {
     return (
       <div>
-        <button
-          onClick={handleLogout}
-          className="logout-button"
-          style={
-            {
-              /* Consider consistent logout button placement */
-            }
-          }
-        >
+        <button onClick={handleLogout} className="logout-button" style={{}}>
           Logout
         </button>
         <div className="loading-message">
@@ -288,15 +284,7 @@ const MainView = () => {
   if (movies.length === 0) {
     return (
       <div>
-        <button
-          onClick={handleLogout}
-          className="logout-button"
-          style={
-            {
-              /* Consistent placement */
-            }
-          }
-        >
+        <button onClick={handleLogout} className="logout-button" style={{}}>
           Logout
         </button>
         <div className="empty-list-message">
