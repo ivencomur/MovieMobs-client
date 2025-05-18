@@ -1,333 +1,164 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { MovieCard } from "../movie-card/movie-card";
 import { MovieView } from "../movie-view/movie-view";
 import { LoginView } from "../login-view/login-view";
 
+const API_BASE_URL = "https://iecm-movies-app-6966360ed90e.herokuapp.com";
+
 export const MainView = () => {
+  const [user, setUser] = useState(null);
+  const [token, setToken] = useState(
+    () => localStorage.getItem("token") || null
+  );
   const [movies, setMovies] = useState([]);
   const [selectedMovie, setSelectedMovie] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [user, setUser] = useState(null);
-  const [token, setToken] = useState(localStorage.getItem("token") || null);
 
-  if (!user && !token) {
-   // When rendering LoginView
-  return (
-      <LoginView
-        onLoggedIn={(loggedInUser, receivedToken) => { // Accept two parameters
-          localStorage.setItem("token", receivedToken); // Store the token
-          setToken(receivedToken);                      // Set token in state
-          setUser(loggedInUser);                        // Set user in state
-        }}
-      />
-    );
-  }
-        
-
-  
-
-  const handleLogin = async (event) => {
-    event.preventDefault();
-    setError(null);
-    setLoading(true);
-    const loginApiUrl =
-      "https://iecm-movies-app-6966360ed90e.herokuapp.com/login";
-
-    try {
-      const response = await fetch(loginApiUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(
-          data.error ||
-            `Login failed: ${response.statusText} (Status: ${response.status})`
-        );
-      }
-      if (data.user && data.token) {
-        localStorage.setItem("token", data.token);
-        setToken(data.token);
-        setUser(data.user);
-        setUsername("");
-        setPassword("");
-      } else {
-        throw new Error(
-          "Login successful, but token or user data was not received from the server."
-        );
-      }
-    } catch (err) {
-      console.error("Login error:", err.message || err);
-      setError(err.message || "An unexpected login error occurred.");
-      localStorage.removeItem("token");
-      setToken(null);
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     localStorage.removeItem("token");
     setToken(null);
     setUser(null);
     setMovies([]);
     setSelectedMovie(null);
     setError(null);
-  };
+  }, []);
 
-  //when the page loads check for token and user if not exists load the movies from api
+  const onLoginSuccessHandler = useCallback(
+    (loggedInUser, receivedToken) => {
+      if (receivedToken) {
+        localStorage.setItem("token", receivedToken);
+        setToken(receivedToken);
+      }
+      if (loggedInUser) {
+        setUser(loggedInUser);
+      }
+    },
+    [setToken, setUser]
+  );
+
   useEffect(() => {
     if (!token) {
-      setLoading(false);
-      if (!user) {
-        setMovies([]);
-      }
+      setMovies([]);
       return;
     }
 
     setLoading(true);
-    const moviesApiUrl =
-      "https://iecm-movies-app-6966360ed90e.herokuapp.com/movies";
     setError(null);
 
-    fetch(moviesApiUrl, {
+    fetch(`${API_BASE_URL}/movies`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((response) => {
         if (response.status === 401) {
           handleLogout();
           throw new Error(
-            "Unauthorized: Your session may have expired. Please log in again."
+            "Your session may have expired. Please log in again."
           );
         }
         if (!response.ok) {
           return response.text().then((text) => {
-            throw new Error(
-              `API Error ${response.status}: ${text || response.statusText}`
-            );
+            let errorMsg = `Failed to fetch movies. Status: ${response.status}`;
+            try {
+              const errBody = JSON.parse(text);
+              errorMsg += ` - ${errBody.error || errBody.message || text}`;
+            } catch (e) {
+              errorMsg += ` - ${text || response.statusText}`;
+            }
+            throw new Error(errorMsg);
           });
         }
         return response.json();
       })
       .then((data) => {
-        const moviesFromApi = data.map((movie) => {
-          const directorName =
-            movie.director && typeof movie.director === "object"
-              ? movie.director.name
-              : "N/A";
-          const directorBio =
-            movie.director && typeof movie.director === "object"
-              ? movie.director.bio
-              : "N/A";
-          const genreName =
-            movie.genre && typeof movie.genre === "object"
-              ? movie.genre.name
-              : "N/A";
-
-          return {
-            _id: movie._id,
-            Title: movie.title,
-            Description: movie.description,
-            Genre: {
-              name: genreName,
-            },
-            Director: {
-              name: directorName,
-              bio: directorBio,
-            },
-            ImagePath: movie.imagePath,
-            FallbackImagePath: null,
-            Featured: movie.featured || false,
-            Cast:
-              movie.actors && Array.isArray(movie.actors)
-                ? movie.actors.map((actor) =>
-                    actor && actor.name ? actor.name : "N/A"
-                  )
-                : [],
-          };
-        });
+        const moviesFromApi = data.map((movie) => ({
+          _id: movie._id,
+          Title: movie.Title || movie.title,
+          Description: movie.Description || movie.description,
+          Genre: movie.Genre || movie.genre,
+          Director: movie.Director || movie.director,
+          ImagePath: movie.ImagePath || movie.imagePath,
+          Featured: movie.Featured || movie.featured || false,
+          Cast: movie.Actors || movie.actors || [],
+        }));
         setMovies(moviesFromApi);
       })
       .catch((err) => {
-        console.error("Failed to fetch movies (full error object):", err);
-
         setError(err.message || "Failed to load movies.");
       })
       .finally(() => {
         setLoading(false);
       });
-  }, [token, user]);
+  }, [token, handleLogout]);
 
-  const handleMovieClick = (clickedMovie) => {
-    setSelectedMovie(clickedMovie);
-  };
+  const handleMovieClick = (movie) => setSelectedMovie(movie);
+  const handleBackClick = () => setSelectedMovie(null);
 
-  const handleBackClick = () => {
-    setSelectedMovie(null);
-  };
-
-  // --- Login View ---
   if (!token) {
-    return (
-      <div
-        className="login-view"
-        style={{
-          padding: "20px",
-          maxWidth: "400px",
-          margin: "50px auto",
-          border: "1px solid #ccc",
-          borderRadius: "8px",
-          textAlign: "center",
-        }}
-      >
-        <form onSubmit={handleLogin}>
-          <h2>Login to MovieMobs</h2>
-          {error && (
-            <p style={{ color: "red", marginBottom: "10px" }}>{error}</p>
-          )}
-          <div style={{ marginBottom: "10px" }}>
-            <label
-              htmlFor="loginUsername"
-              style={{ display: "block", marginBottom: "5px" }}
-            >
-              Username:{" "}
-            </label>
-            <input
-              id="loginUsername"
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-              style={{ padding: "8px", width: "100%", boxSizing: "border-box" }}
-            />
-          </div>
-          <div style={{ marginBottom: "15px" }}>
-            <label
-              htmlFor="loginPassword"
-              style={{ display: "block", marginBottom: "5px" }}
-            >
-              Password:{" "}
-            </label>
-            <input
-              id="loginPassword"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              style={{ padding: "8px", width: "100%", boxSizing: "border-box" }}
-            />
-          </div>
-          <button
-            type="submit"
-            disabled={loading}
-            style={{ padding: "10px 20px", cursor: "pointer" }}
-          >
-            {loading ? "Logging in..." : "Login"}
-          </button>
-        </form>
-      </div>
-    );
+    return <LoginView onLoggedIn={onLoginSuccessHandler} />;
   }
 
-  // --- Loading Movies View ---
   if (loading && movies.length === 0) {
     return (
       <div>
-        <button onClick={handleLogout} className="logout-button" style={{}}>
-          Logout
-        </button>
-        <div className="loading-message">
-          We are loading the movies... Please wait.
-        </div>
+        {user && <button onClick={handleLogout}>Logout</button>}
+        <div>Loading movies...</div>
       </div>
     );
   }
 
-  // --- Error Fetching Movies View ---
   if (error) {
     return (
       <div>
-        <button
-          onClick={handleLogout}
-          className="logout-button"
-          style={
-            {
-              /* Consider consistent logout button placement */
-            }
-          }
-        >
-          Logout
-        </button>
-        <div className="empty-list-message">
-          There was an error fetching the movies: {error}. Please try again
-          later or contact support.
-        </div>
+        {user && <button onClick={handleLogout}>Logout</button>}
+        <div>Error: {error}</div>
       </div>
     );
   }
 
-  // --- Movie Details View ---
   if (selectedMovie) {
     return (
       <div>
-        <button
-          onClick={handleLogout}
-          className="logout-button"
-          style={
-            {
-              /* Consistent placement */
-            }
-          }
-        >
-          Logout
-        </button>
+        {user && <button onClick={handleLogout}>Logout</button>}
         <MovieView movie={selectedMovie} onBackClick={handleBackClick} />
       </div>
     );
   }
 
-  // --- No Movies Available View ---
-  if (movies.length === 0) {
+  if (movies.length === 0 && !loading) {
     return (
       <div>
-        <button onClick={handleLogout} className="logout-button" style={{}}>
-          Logout
-        </button>
-        <div className="empty-list-message">
-          Sorry!, there are no movies available at the moment.
-        </div>
-        {user && (
-          <p style={{ textAlign: "center" }}>Welcome, {user.username}!</p>
-        )}
+        {user && <button onClick={handleLogout}>Logout</button>}
+        {user && <p>Welcome, {user.username}!</p>}
+        <div>No movies available at the moment.</div>
       </div>
     );
   }
 
-  // --- Main Movies List View ---
   return (
     <div>
-      <button
-        onClick={handleLogout}
-        className="logout-button"
-        style={
-          {
-            /* Consistent placement */
-          }
-        }
-      >
-        Logout
-      </button>
       {user && (
-        <h2 style={{ textAlign: "center", marginBottom: "20px" }}>
-          Welcome, {user.username}! Let's explore our movies:
+        <button
+          onClick={handleLogout}
+          style={{ position: "absolute", top: "10px", right: "10px" }}
+        >
+          Logout
+        </button>
+      )}
+      {user && (
+        <h2 style={{ textAlign: "center" }}>
+          Welcome, {user.username}! Explore movies:
         </h2>
       )}
-      <div className="movies-list">
+      <div
+        className="movies-list"
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "20px",
+          justifyContent: "center",
+        }}
+      >
         {movies.map((movie) => (
           <MovieCard
             key={movie._id}
