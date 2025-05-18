@@ -7,7 +7,8 @@ export const MovieView = ({ movie, onBackClick }) => {
       e.target.onerror = null;
       e.target.src = movie.FallbackImagePath;
     } else if (!movie.FallbackImagePath) {
-      e.target.onerror = null;
+      e.target.onerror = null; 
+      e.target.style.display = 'none';
     }
   };
 
@@ -27,7 +28,7 @@ export const MovieView = ({ movie, onBackClick }) => {
       <div>
         <img
           className="movie-poster"
-          src={movie.ImagePath}
+          src={movie.ImagePath || 'placeholder-detail.jpg'}
           alt={`Poster for ${movie.Title}`}
           onError={handleImageError}
         />
@@ -86,7 +87,6 @@ MovieView.propTypes = {
     FallbackImagePath: PropTypes.string,
     Genre: PropTypes.shape({
       name: PropTypes.string,
-      description: PropTypes.string,
     }),
     Director: PropTypes.shape({
       name: PropTypes.string,

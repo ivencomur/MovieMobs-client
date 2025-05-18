@@ -12,7 +12,7 @@ export const LoginView = ({ onLoggedIn }) => {
     setIsLoading(true);
     setError(null);
 
-    const data = {
+    const loginData = {
       username: username,
       password: password,
     };
@@ -22,7 +22,7 @@ export const LoginView = ({ onLoggedIn }) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify(loginData),
     })
       .then((response) => {
         if (response.ok) {
@@ -34,12 +34,12 @@ export const LoginView = ({ onLoggedIn }) => {
               throw new Error(
                 errBody.error ||
                   errBody.message ||
-                  `Login failed: ${response.statusText} (Status: ${response.status})`
+                  `Login failed: Status ${response.status}`
               );
             })
             .catch(() => {
               throw new Error(
-                `Login failed: ${response.statusText} (Status: ${response.status})`
+                `Login failed: Status ${response.status} - ${response.statusText}`
               );
             });
         }
@@ -51,7 +51,9 @@ export const LoginView = ({ onLoggedIn }) => {
             onLoggedIn(data.user, data.token);
           }
         } else {
-          setError("Login response missing user or token.");
+          setError(
+            "Login response was successful but missing user or token data."
+          );
         }
       })
       .catch((e) => {
@@ -61,13 +63,14 @@ export const LoginView = ({ onLoggedIn }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Login</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      <div>
-        <label>
-          Username:
+    <div className="login-view">
+      <form onSubmit={handleSubmit} className="login-form">
+        <h2>Login to MovieMobs</h2>
+        {error && <p className="error-message">{error}</p>}
+        <div className="form-group">
+          <label htmlFor="loginUsername">Username:</label>
           <input
+            id="loginUsername"
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
@@ -75,24 +78,23 @@ export const LoginView = ({ onLoggedIn }) => {
             minLength="5"
             disabled={isLoading}
           />
-        </label>
-      </div>
-      <div>
-        <label>
-          Password:
+        </div>
+        <div className="form-group">
+          <label htmlFor="loginPassword">Password:</label>
           <input
+            id="loginPassword"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
             disabled={isLoading}
           />
-        </label>
-      </div>
-      <button type="submit" disabled={isLoading}>
-        {isLoading ? "Logging in..." : "Submit"}
-      </button>
-    </form>
+        </div>
+        <button type="submit" disabled={isLoading} className="login-button">
+          {isLoading ? "Logging in..." : "Login"}
+        </button>
+      </form>
+    </div>
   );
 };
 
