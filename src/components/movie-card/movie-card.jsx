@@ -7,14 +7,18 @@ export const MovieCard = ({ movie, onMovieClick }) => {
       e.target.onerror = null;
       e.target.src = movie.FallbackImagePath;
     } else {
-      e.target.style.display = 'none'; // Hide broken image icon if no fallback
+      e.target.style.backgroundColor = "#f0f0f0"; // Placeholder color
+      e.target.alt = "Image not available";
     }
   };
 
   return (
     <div className="movie-card" onClick={() => onMovieClick(movie)}>
       <img
-        src={movie.ImagePath || 'placeholder.jpg'} // Provide a default placeholder if ImagePath might be null/undefined
+        src={
+          movie.ImagePath ||
+          "https://via.placeholder.com/200x300.png?text=No+Image"
+        }
         alt={`Poster for ${movie.Title}`}
         onError={handleImageError}
         loading="lazy"
@@ -28,9 +32,8 @@ MovieCard.propTypes = {
   movie: PropTypes.shape({
     _id: PropTypes.string.isRequired,
     Title: PropTypes.string.isRequired,
-    ImagePath: PropTypes.string, 
+    ImagePath: PropTypes.string,
     FallbackImagePath: PropTypes.string,
-    
   }).isRequired,
   onMovieClick: PropTypes.func.isRequired,
 };

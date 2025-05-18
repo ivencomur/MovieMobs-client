@@ -1,11 +1,11 @@
-import { createRoot } from 'react-dom/client';
-import MainView from './components/main-view/main-view';
+import { createRoot } from "react-dom/client";
+import MainView from "./components/main-view/main-view";
 import "./index.scss";
 
 const MovieMobsApplication = () => {
   return (
     <div className="movie-mobs-app">
-       <MainView />
+      <MainView />
     </div>
   );
 };

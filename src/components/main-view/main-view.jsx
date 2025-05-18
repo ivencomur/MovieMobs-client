@@ -12,7 +12,7 @@ export const MainView = () => {
   );
   const [movies, setMovies] = useState([]);
   const [selectedMovie, setSelectedMovie] = useState(null);
-  const [loading, setLoading] = useState(false); // Default to false, true when fetching
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const handleLogout = useCallback(() => {
@@ -32,12 +32,12 @@ export const MainView = () => {
     if (loggedInUser) {
       setUser(loggedInUser);
     }
-  }, []); // Removed setToken, setUser from deps as they are stable
+  }, []);
 
   useEffect(() => {
     if (!token) {
-      setMovies([]); // Clear movies if there's no token
-      setLoading(false); // Ensure loading is false if no token
+      setMovies([]);
+      setLoading(false);
       return;
     }
 
@@ -49,17 +49,18 @@ export const MainView = () => {
     })
       .then((response) => {
         if (response.status === 401) {
-          handleLogout(); // Token is invalid or expired
-          throw new Error("Your session has expired. Please log in again.");
+          handleLogout();
+          throw new Error(
+            "Your session may have expired. Please log in again."
+          );
         }
         if (!response.ok) {
           return response.text().then((text) => {
             let errorMsg = `Failed to fetch movies. Status: ${response.status}`;
             try {
-              const errBody = JSON.parse(text); // Try to parse error from backend
+              const errBody = JSON.parse(text);
               errorMsg += ` - ${errBody.error || errBody.message || text}`;
             } catch (e) {
-              // Fallback if response is not JSON
               errorMsg += ` - ${text || response.statusText}`;
             }
             throw new Error(errorMsg);
@@ -72,13 +73,15 @@ export const MainView = () => {
           _id: movie._id,
           Title: movie.Title || movie.title,
           Description: movie.Description || movie.description,
-          Genre: movie.Genre, // Assuming Genre object is returned directly
-          Director: movie.Director, // Assuming Director object is returned directly
+          Genre: movie.Genre,
+          Director: movie.Director,
           ImagePath: movie.ImagePath || movie.imagePath,
           Featured: movie.Featured || movie.featured || false,
           Cast: movie.Actors
-            ? movie.Actors.map((actor) => actor.name || "N/A")
-            : [], // Extract names if Actors is an array of objects
+            ? movie.Actors.map((actor) =>
+                typeof actor === "object" ? actor.name : actor
+              )
+            : [],
         }));
         setMovies(moviesFromApi);
       })
@@ -98,7 +101,6 @@ export const MainView = () => {
   }
 
   if (loading) {
-    // Simplified loading state
     return (
       <div>
         {user && (
@@ -138,7 +140,6 @@ export const MainView = () => {
   }
 
   if (movies.length === 0) {
-    // After loading, if still no movies
     return (
       <div>
         {user && (

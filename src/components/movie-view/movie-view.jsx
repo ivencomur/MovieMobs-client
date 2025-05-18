@@ -6,9 +6,9 @@ export const MovieView = ({ movie, onBackClick }) => {
     if (movie.FallbackImagePath && e.target.src !== movie.FallbackImagePath) {
       e.target.onerror = null;
       e.target.src = movie.FallbackImagePath;
-    } else if (!movie.FallbackImagePath) {
-      e.target.onerror = null; 
-      e.target.style.display = 'none';
+    } else {
+      e.target.style.backgroundColor = "#f0f0f0";
+      e.target.alt = "Image not available";
     }
   };
 
@@ -28,7 +28,10 @@ export const MovieView = ({ movie, onBackClick }) => {
       <div>
         <img
           className="movie-poster"
-          src={movie.ImagePath || 'placeholder-detail.jpg'}
+          src={
+            movie.ImagePath ||
+            "https://via.placeholder.com/350x525.png?text=No+Image"
+          }
           alt={`Poster for ${movie.Title}`}
           onError={handleImageError}
         />
@@ -85,9 +88,7 @@ MovieView.propTypes = {
     Description: PropTypes.string.isRequired,
     ImagePath: PropTypes.string,
     FallbackImagePath: PropTypes.string,
-    Genre: PropTypes.shape({
-      name: PropTypes.string,
-    }),
+    Genre: PropTypes.shape({ name: PropTypes.string }),
     Director: PropTypes.shape({
       name: PropTypes.string,
       bio: PropTypes.string,
