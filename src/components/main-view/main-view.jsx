@@ -11,12 +11,23 @@ export const MainView = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [user, setUser] = useState(null);
-
-  if (!user) {
-    return <LoginView onLoggedIn={(user) => setUser(user)} />;
-  }
-
   const [token, setToken] = useState(localStorage.getItem("token") || null);
+
+  if (!user && !token) {
+   // When rendering LoginView
+  return (
+      <LoginView
+        onLoggedIn={(loggedInUser, receivedToken) => { // Accept two parameters
+          localStorage.setItem("token", receivedToken); // Store the token
+          setToken(receivedToken);                      // Set token in state
+          setUser(loggedInUser);                        // Set user in state
+        }}
+      />
+    );
+  }
+        
+
+  
 
   const handleLogin = async (event) => {
     event.preventDefault();

@@ -6,11 +6,11 @@ export const LoginView = ({ onLoggedIn }) => {
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = {
-      access: username,
-      secret: password,
+      username: username,
+      password: password,
     };
 
-    fetch("https://iecm-movies-app-6966360ed90e.herokuapp.com/login.html", {
+    fetch("https://iecm-movies-app-6966360ed90e.herokuapp.com/login", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -27,7 +27,7 @@ export const LoginView = ({ onLoggedIn }) => {
       })
       .then((data) => {
         console.log("login successful, API responding:", data);
-        if (onLoggedIn) {
+        if (onLoggedIn && data.user && data.token) {
           onLoggedIn(data.user, data.token);
         }
       })
@@ -35,7 +35,7 @@ export const LoginView = ({ onLoggedIn }) => {
         console.error("login error", e);
       });
   };
-  
+
   return (
     <form onSubmit={handleSubmit}>
       <label>
