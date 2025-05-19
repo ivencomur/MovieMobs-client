@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
 
-export const LoginView = ({ onLoggedIn }) => {
+export const SignupView = ({ onLoggedIn }) => {
   //state for managing form inputs and loading state
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -65,9 +65,9 @@ export const LoginView = ({ onLoggedIn }) => {
 
   //on sumbit call function with event
   return (
-    <div className="login-view">
-      <form onSubmit={handleSubmit} className="login-form">
-        <h2>Login to MovieMobs</h2>
+    <div className="signup-view">
+      <form onSubmit={handleSubmit} className="signup-form">
+        <h2>Signup to MovieMobs</h2>
         {error && <p className="error-message">{error}</p>}
         <div className="form-group">
           <label htmlFor="loginUsername">Username:</label>
@@ -100,6 +100,6 @@ export const LoginView = ({ onLoggedIn }) => {
   );
 };
 
-LoginView.propTypes = {
+SignupView.propTypes = {
   onLoggedIn: PropTypes.func.isRequired,
 };
