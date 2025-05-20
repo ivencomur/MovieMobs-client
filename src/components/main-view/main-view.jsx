@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { MovieCard } from "../movie-card/movie-card";
 import { MovieView } from "../movie-view/movie-view";
 import { LoginView } from "../login-view/login-view";
+import { SignupView } from "../signup-view/signup-view";
 
 const API_BASE_URL = "https://iecm-movies-app-6966360ed90e.herokuapp.com";
 
@@ -97,7 +98,12 @@ export const MainView = () => {
   const handleBackClick = () => setSelectedMovie(null);
 
   if (!token) {
-    return <LoginView onLoggedIn={onLoginSuccessHandler} />;
+    return (
+      <div>
+        <LoginView onLoggedIn={onLoginSuccessHandler} />
+        <SignupView onLoggedIn={() => {}}/>
+      </div>
+    );
   }
 
   if (loading) {
