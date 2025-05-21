@@ -101,7 +101,7 @@ export const MainView = () => {
     return (
       <div>
         <LoginView onLoggedIn={onLoginSuccessHandler} />
-        <SignupView onLoggedIn={() => {}}/>
+        <SignupView onLoggedIn={onLoginSuccessHandler} />
       </div>
     );
   }
