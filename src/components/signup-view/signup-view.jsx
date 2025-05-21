@@ -17,7 +17,7 @@ export const SignupView = ({ onLoggedIn }) => {
       password: password,
     };
 
-    fetch("https://iecm-movies-app-6966360ed90e.herokuapp.com/login", {
+    fetch("https://iecm-movies-app-6966360ed90e.herokuapp.com", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
