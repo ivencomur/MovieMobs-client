@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-
+import './login-view.scss'
+import { login } from "../../movies-api";
 export const LoginView = ({ onLoggedIn }) => {
   //state for managing form inputs and loading state
   const [username, setUsername] = useState("");
@@ -8,59 +9,28 @@ export const LoginView = ({ onLoggedIn }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     setIsLoading(true);
     setError(null);
 
-    const loginData = {
-      username: username,
-      password: password,
-    };
-
-    fetch("https://iecm-movies-app-6966360ed90e.herokuapp.com/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(loginData),
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          return response
-            .json()
-            .then((errBody) => {
-              throw new Error(
-                errBody.error ||
-                  errBody.message ||
-                  `Login failed: Status ${response.status}`
-              );
-            })
-            .catch(() => {
-              throw new Error(
-                `Login failed: Status ${response.status} - ${response.statusText}`
-              );
-            });
+    try {
+      let data = await login(username, password)
+      
+      if (data.user && data.token) {
+        if (onLoggedIn) {
+          onLoggedIn(data.user, data.token);
         }
-      })
-      .then((data) => {
-        setIsLoading(false);
-        if (data.user && data.token) {
-          if (onLoggedIn) {
-            onLoggedIn(data.user, data.token);
-          }
-        } else {
-          setError(
-            "Login response was successful but missing user or token data."
-          );
-        }
-      })
-      .catch((e) => {
+      } else {
+        setError(
+          "Login response was successful but missing user or token data."
+        );
+      }
+      setIsLoading(false);
+    } catch (error) {
         setIsLoading(false);
         setError(e.message || "An unexpected error occurred during login.");
-      });
+    }
   };
 
   //on sumbit call function with event

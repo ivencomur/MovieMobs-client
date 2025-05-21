@@ -1,65 +1,37 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-
+import './signup-view.scss'
+import { login, signupUser } from "../../movies-api";
 export const SignupView = ({ onLoggedIn }) => {
   const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async(event) => {
     event.preventDefault();
     setIsLoading(true);
     setError(null);
 
-    const signupData = {
-      username: username,
-      password: password,
-    };
-
-    fetch("https://iecm-movies-app-6966360ed90e.herokuapp.com", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(signupData),
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          return response
-            .json()
-            .then((errBody) => {
-              throw new Error(
-                errBody.error ||
-                  errBody.message ||
-                  `Authentication failed: Status ${response.status}`
-              );
-            })
-            .catch(() => {
-              throw new Error(
-                `Authentication failed: Status ${response.status} - ${response.statusText}`
-              );
-            });
+    //send user to api to be created
+    try {
+      let signupResponse = await signupUser(username,email, password)
+      if (signupResponse) {
+        let loginResponse = await login(username, password)
+        if (onLoggedIn) {
+          onLoggedIn(signupResponse, loginResponse.token);
         }
-      })
-      .then((data) => {
-        setIsLoading(false);
-        if (data.user && data.token) {
-          if (onLoggedIn) {
-            onLoggedIn(data.user, data.token);
-          }
-        } else {
-          setError(
-            "Authentication response was successful but missing user or token data."
-          );
-        }
-      })
-      .catch((e) => {
-        setIsLoading(false);
-        setError(e.message || "An unexpected error occurred during signup.");
-      });
+      } else {
+        setError(
+          "Authentication response was successful but missing user or token data."
+        );
+      }
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+        setError(error.message || "An unexpected error occurred during signup.");
+    }
   };
 
   return (
@@ -76,6 +48,17 @@ export const SignupView = ({ onLoggedIn }) => {
             onChange={(e) => setUsername(e.target.value)}
             required
             minLength="5"
+            disabled={isLoading}
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="signupEmail">Email:</label>
+          <input
+            id="signupEmail"
+            type="text"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
             disabled={isLoading}
           />
         </div>
