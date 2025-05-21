@@ -1,78 +1,48 @@
 import React, { useState } from "react";
 import PropTypes from "prop-types";
-
+import './signup-view.scss'
+import { login, signupUser } from "../../movies-api";
 export const SignupView = ({ onLoggedIn }) => {
-  //state for managing form inputs and loading state
   const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async(event) => {
     event.preventDefault();
     setIsLoading(true);
     setError(null);
 
-    const loginData = {
-      username: username,
-      password: password,
-    };
-
-    fetch("https://iecm-movies-app-6966360ed90e.herokuapp.com/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(loginData),
-    })
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        } else {
-          return response
-            .json()
-            .then((errBody) => {
-              throw new Error(
-                errBody.error ||
-                  errBody.message ||
-                  `Login failed: Status ${response.status}`
-              );
-            })
-            .catch(() => {
-              throw new Error(
-                `Login failed: Status ${response.status} - ${response.statusText}`
-              );
-            });
+    //send user to api to be created
+    try {
+      let signupResponse = await signupUser(username,email, password)
+      if (signupResponse) {
+        let loginResponse = await login(username, password)
+        if (onLoggedIn) {
+          onLoggedIn(signupResponse, loginResponse.token);
         }
-      })
-      .then((data) => {
-        setIsLoading(false);
-        if (data.user && data.token) {
-          if (onLoggedIn) {
-            onLoggedIn(data.user, data.token);
-          }
-        } else {
-          setError(
-            "Login response was successful but missing user or token data."
-          );
-        }
-      })
-      .catch((e) => {
-        setIsLoading(false);
-        setError(e.message || "An unexpected error occurred during login.");
-      });
+      } else {
+        setError(
+          "Authentication response was successful but missing user or token data."
+        );
+      }
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+        setError(error.message || "An unexpected error occurred during signup.");
+    }
   };
 
-  //on sumbit call function with event
   return (
     <div className="signup-view">
       <form onSubmit={handleSubmit} className="signup-form">
-        <h2>Signup to MovieMobs</h2>
+        <h2>Sign Up for MovieMobs</h2>
         {error && <p className="error-message">{error}</p>}
         <div className="form-group">
-          <label htmlFor="loginUsername">Username:</label>
+          <label htmlFor="signupUsername">Username:</label>
           <input
-            id="loginUsername"
+            id="signupUsername"
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
@@ -82,9 +52,20 @@ export const SignupView = ({ onLoggedIn }) => {
           />
         </div>
         <div className="form-group">
-          <label htmlFor="loginPassword">Password:</label>
+          <label htmlFor="signupEmail">Email:</label>
           <input
-            id="loginPassword"
+            id="signupEmail"
+            type="text"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            disabled={isLoading}
+          />
+        </div>
+        <div className="form-group">
+          <label htmlFor="signupPassword">Password:</label>
+          <input
+            id="signupPassword"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -92,8 +73,8 @@ export const SignupView = ({ onLoggedIn }) => {
             disabled={isLoading}
           />
         </div>
-        <button type="submit" disabled={isLoading} className="login-button">
-          {isLoading ? "Logging in..." : "Login"}
+        <button type="submit" disabled={isLoading} className="signup-button">
+          {isLoading ? "Signing up..." : "Sign Up"}
         </button>
       </form>
     </div>
