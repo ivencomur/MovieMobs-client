@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 
 export const SignupView = ({ onLoggedIn }) => {
-  //state for managing form inputs and loading state
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -13,7 +12,7 @@ export const SignupView = ({ onLoggedIn }) => {
     setIsLoading(true);
     setError(null);
 
-    const loginData = {
+    const signupData = {
       username: username,
       password: password,
     };
@@ -23,7 +22,7 @@ export const SignupView = ({ onLoggedIn }) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(loginData),
+      body: JSON.stringify(signupData),
     })
       .then((response) => {
         if (response.ok) {
@@ -35,12 +34,12 @@ export const SignupView = ({ onLoggedIn }) => {
               throw new Error(
                 errBody.error ||
                   errBody.message ||
-                  `Login failed: Status ${response.status}`
+                  `Authentication failed: Status ${response.status}`
               );
             })
             .catch(() => {
               throw new Error(
-                `Login failed: Status ${response.status} - ${response.statusText}`
+                `Authentication failed: Status ${response.status} - ${response.statusText}`
               );
             });
         }
@@ -53,26 +52,25 @@ export const SignupView = ({ onLoggedIn }) => {
           }
         } else {
           setError(
-            "Login response was successful but missing user or token data."
+            "Authentication response was successful but missing user or token data."
           );
         }
       })
       .catch((e) => {
         setIsLoading(false);
-        setError(e.message || "An unexpected error occurred during login.");
+        setError(e.message || "An unexpected error occurred during signup.");
       });
   };
 
-  //on sumbit call function with event
   return (
     <div className="signup-view">
       <form onSubmit={handleSubmit} className="signup-form">
-        <h2>Signup to MovieMobs</h2>
+        <h2>Sign Up for MovieMobs</h2>
         {error && <p className="error-message">{error}</p>}
         <div className="form-group">
-          <label htmlFor="loginUsername">Username:</label>
+          <label htmlFor="signupUsername">Username:</label>
           <input
-            id="loginUsername"
+            id="signupUsername"
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
@@ -82,9 +80,9 @@ export const SignupView = ({ onLoggedIn }) => {
           />
         </div>
         <div className="form-group">
-          <label htmlFor="loginPassword">Password:</label>
+          <label htmlFor="signupPassword">Password:</label>
           <input
-            id="loginPassword"
+            id="signupPassword"
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -92,8 +90,8 @@ export const SignupView = ({ onLoggedIn }) => {
             disabled={isLoading}
           />
         </div>
-        <button type="submit" disabled={isLoading} className="login-button">
-          {isLoading ? "Logging in..." : "Login"}
+        <button type="submit" disabled={isLoading} className="signup-button">
+          {isLoading ? "Signing up..." : "Sign Up"}
         </button>
       </form>
     </div>
