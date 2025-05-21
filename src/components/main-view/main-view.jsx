@@ -145,7 +145,7 @@ export const MainView = () => {
     );
   }
 
-  if (movies.length === 0) {
+  if (movies.length === 0 && !loading) {
     return (
       <div>
         {user && (
@@ -155,7 +155,7 @@ export const MainView = () => {
         )}
         {user && <p className="welcome-message">Welcome, {user.username}!</p>}
         <div className="empty-list-message">
-          No movies available at the moment.
+          No movies available at the moment, or failed to load.
         </div>
       </div>
     );
