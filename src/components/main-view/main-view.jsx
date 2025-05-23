@@ -1,10 +1,12 @@
+
 import React, { useState, useEffect, useCallback } from "react";
 // Import child components.
 import { MovieCard } from "../movie-card/movie-card";
 import { MovieView } from "../movie-view/movie-view";
 import { LoginView } from "../login-view/login-view";
 import { SignupView } from "../signup-view/signup-view";
-// Import React Bootstrap components for layout and UI.
+import { NavigationBar } from "../navigation-bar/navigation-bar"; // Import NavigationBar
+// Import React Bootstrap components.
 import {
   Row,
   Col,
@@ -12,6 +14,8 @@ import {
   Spinner,
   Alert,
 } from "react-bootstrap";
+// Import React Router components.
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 // Define the base URL for the movie API.
 const API_BASE_URL = "https://iecm-movies-app-6966360ed90e.herokuapp.com";
@@ -21,30 +25,27 @@ export const MainView = () => {
   const storedUser = JSON.parse(localStorage.getItem("user"));
   const storedToken = localStorage.getItem("token");
 
-  // State variables for user, token, movies, selected movie, loading, errors, and signup toggle.
+  // State variables for user, token, movies, loading, and errors.
   const [user, setUser] = useState(storedUser ? storedUser : null);
   const [token, setToken] = useState(storedToken ? storedToken : null);
   const [movies, setMovies] = useState([]);
-  const [selectedMovie, setSelectedMovie] = useState(null);
+  // selectedMovie state is removed; routing handles which movie to view.
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [showSignup, setShowSignup] = useState(false); // To switch between login and signup forms
+  // showSignup state is removed; navigation to signup is handled by its route.
 
   // Callback function to handle user logout.
   const handleLogout = useCallback(() => {
-    // Clear user and token from localStorage and state.
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setToken(null);
     setUser(null);
-    setSelectedMovie(null); // Clear selected movie
-    setError(null); // Clear any errors
-    setShowSignup(false); // Reset signup toggle
-  }, []); // Empty dependency array as it doesn't depend on component state/props
+    // movies and selectedMovie will clear or become irrelevant due to logged-out state.
+    setError(null);
+  }, []);
 
   // Callback function for successful login.
   const onLoginSuccessHandler = useCallback((loggedInUser, receivedToken) => {
-    // Store user and token in localStorage and update state.
     if (receivedToken) {
       localStorage.setItem("token", receivedToken);
       setToken(receivedToken);
@@ -53,58 +54,51 @@ export const MainView = () => {
       localStorage.setItem("user", JSON.stringify(loggedInUser));
       setUser(loggedInUser);
     }
-    setShowSignup(false); // Hide signup form
-    setSelectedMovie(null); // Ensure no movie is selected
-    setError(null); // Clear any previous errors
-  }, []); // Empty dependency array
+    setError(null); // Clear any previous login/signup errors
+  }, []);
 
   // useEffect hook to fetch movies when the token changes.
   useEffect(() => {
-    // If there's no token, clear movies and stop loading.
     if (!token) {
-      setMovies([]);
+      setMovies([]); // Clear movies if no token
       setLoading(false);
       return;
     }
 
-    // Set loading state and clear previous errors before fetching.
     setLoading(true);
     setError(null);
 
-    // Fetch movies from the API.
     fetch(`${API_BASE_URL}/movies`, {
-      headers: { Authorization: `Bearer ${token}` }, // Send token for authorization
+      headers: { Authorization: `Bearer ${token}` },
     })
       .then(async (response) => {
-        // Handle 401 Unauthorized (session expired).
         if (response.status === 401) {
-          handleLogout(); // Log out the user
+          handleLogout(); // If unauthorized, log out
           throw new Error("Session expired. Please log in again.");
         }
-        // Handle other non-OK responses.
         if (!response.ok) {
           const errorBodyText = await response.text();
           let errorMsg = `Failed to fetch movies (Status: ${response.status})`;
           try {
-            const errData = JSON.parse(errorBodyText); // Try to parse error body as JSON
+            const errData = JSON.parse(errorBodyText);
             errorMsg += ` - ${
               errData.message || errData.error || errorBodyText
             }`;
           } catch (e) {
-            errorMsg += ` - ${errorBodyText || response.statusText}`; // Fallback to text or statusText
+            errorMsg += ` - ${errorBodyText || response.statusText}`;
           }
           throw new Error(errorMsg);
         }
-        return response.json(); // Parse successful response as JSON
+        return response.json();
       })
       .then((data) => {
         // Map API data to the structure expected by components.
         const moviesFromApi = data.map((movie) => ({
-          _id: movie._id,
+          _id: movie._id, // Crucial for keys and route parameters
           Title: movie.Title || movie.title,
           Description: movie.Description || movie.description,
-          Genre: movie.Genre,
-          Director: movie.Director,
+          Genre: movie.Genre, // Assumes Genre is an object { name, description } or string
+          Director: movie.Director, // Assumes Director is an object { name, bio } or string
           ImagePath: movie.ImagePath || movie.imagePath,
           Featured: movie.Featured || movie.featured || false,
           Cast: movie.Actors
@@ -117,202 +111,161 @@ export const MainView = () => {
               )
             : [],
         }));
-        setMovies(moviesFromApi); // Update movies state
+        setMovies(moviesFromApi);
       })
       .catch((err) => {
-        setError(err.message || "Failed to load movies."); // Set error state
+        setError(err.message || "Failed to load movies.");
       })
       .finally(() => {
-        setLoading(false); // Reset loading state
+        setLoading(false);
       });
   }, [token, handleLogout]); // Dependencies: token and handleLogout
 
-  // Handler for when a movie card is clicked.
-  const handleMovieClick = (movie) => setSelectedMovie(movie);
-  // Handler for the "back" button in MovieView.
-  const handleBackClick = () => setSelectedMovie(null);
-
-  // Common header section with app title and logout button.
-  const commonHeader = (
-    <Row className="align-items-center mb-4">
-      <Col>
-        {/* Display app title if user is logged in. */}
-        {user && <h1 className="welcome-message">MovieMobs</h1>}
-      </Col>
-      <Col xs="auto">
-        {/* Display logout button if user is logged in. */}
-        {user && (
-          <BootstrapButton
-            variant="outline-secondary" // Themed Bootstrap button
-            onClick={handleLogout}
-            className="logout-button" // Custom class for potential SCSS styling
-          >
-            Logout
-          </BootstrapButton>
-        )}
-      </Col>
-    </Row>
-  );
-
-  // Conditional rendering based on application state.
-
-  // Initial loading state when fetching movies for the first time.
-  if (loading && !selectedMovie && movies.length === 0 && token) {
-    return (
-      <>
-        {commonHeader}
-        <Row
-          className="justify-content-center align-items-center"
-          style={{ minHeight: "60vh" }}
-        >
-          <Col xs="auto" className="text-center">
-            <Spinner
-              animation="border"
-              variant="primary"
-              className="mb-2"
-              style={{ width: "3rem", height: "3rem" }}
-            />
-            <p className="loading-message">Loading movies...</p>
-          </Col>
-        </Row>
-      </>
-    );
-  }
-
-  // Error state.
-  if (error) {
-    return (
-      <>
-        {commonHeader}
-        <Row className="justify-content-center mt-4">
-          <Col md={8}>
-            <Alert variant="danger">
-              <Alert.Heading>An Error Occurred</Alert.Heading>
-              <p>{error}</p>
-              {/* Provide a direct way to re-login if session expired. */}
-              {error.includes("Session expired") && (
-                <BootstrapButton
-                  variant="primary"
-                  onClick={() => {
-                    setError(null);
-                    handleLogout();
-                  }}
-                >
-                  Login Again
-                </BootstrapButton>
-              )}
-            </Alert>
-          </Col>
-        </Row>
-      </>
-    );
-  }
-
-  // If user is not logged in (no token or user object).
-  if (!token || !user) {
-    return (
-      // Centered layout for login/signup forms.
-      <Row
-        className="justify-content-center align-items-center"
-        style={{ minHeight: "calc(100vh - 100px)" }}
-      >
-        <Col md={8} lg={6} xl={5}>
-          {" "}
-          {/* Responsive column width for forms */}
-          {/* Toggle between SignupView and LoginView. */}
-          {showSignup ? (
-            <>
-              <SignupView onLoggedIn={onLoginSuccessHandler} />
-              <p className="text-center mt-3">
-                Already have an account?{" "}
-                <BootstrapButton
-                  variant="link"
-                  onClick={() => setShowSignup(false)}
-                >
-                  Login
-                </BootstrapButton>
-              </p>
-            </>
-          ) : (
-            <>
-              <LoginView onLoggedIn={onLoginSuccessHandler} />
-              <p className="text-center mt-3">
-                Don't have an account?{" "}
-                <BootstrapButton
-                  variant="link"
-                  onClick={() => setShowSignup(true)}
-                >
-                  Sign Up Here
-                </BootstrapButton>
-              </p>
-            </>
-          )}
-        </Col>
-      </Row>
-    );
-  }
-
-  // If a movie is selected, show the MovieView.
-  if (selectedMovie) {
-    return (
-      <>
-        {commonHeader}
-        <MovieView movie={selectedMovie} onBackClick={handleBackClick} />
-      </>
-    );
-  }
-
-  // If no movies are available (after loading and no errors).
-  if (movies.length === 0 && !loading) {
-    return (
-      <>
-        {commonHeader}
-        <Row className="justify-content-center mt-4">
-          <Col md={8} className="text-center">
-            <Alert variant="info" className="empty-list-message">
-              No movies available at the moment. Please check back later.
-            </Alert>
-          </Col>
-        </Row>
-      </>
-    );
-  }
-
-  // Default view: Display the list of movies.
   return (
-    <>
-      {commonHeader}
-      {/* Responsive grid for displaying movie cards. */}
-      {/* xs, sm, md, lg, xl define columns per row at different breakpoints. g-4 for gutters. */}
-      <Row xs={1} sm={2} md={3} lg={4} xl={5} className="g-4 movies-grid">
-        {movies.map((movie) => (
-          // Each card in a column, ensuring cards stretch to equal height.
-          <Col key={movie._id} className="d-flex align-items-stretch">
-            <MovieCard movie={movie} onMovieClick={handleMovieClick} />
-          </Col>
-        ))}
+    // BrowserRouter enables routing capabilities for the components within it.
+    <BrowserRouter>
+      {/* NavigationBar provides consistent navigation across views. */}
+      <NavigationBar user={user} onLoggedOut={handleLogout} />
+
+      {/* Main content area, typically within a Bootstrap Row for layout. */}
+      <Row className="justify-content-md-center mt-4">
+        {" "}
+        {/* Added mt-4 for spacing below navbar */}
+        {/* Routes define which component to render based on the current URL path. */}
+        <Routes>
+          {/* Route for the Signup page. */}
+          <Route
+            path="/signup"
+            element={
+              user ? (
+                // If a user is already logged in, redirect them to the homepage.
+                <Navigate to="/" />
+              ) : (
+                // Otherwise, show the SignupView.
+                <Col md={5}>
+                  <SignupView onLoggedIn={onLoginSuccessHandler} />
+                </Col>
+              )
+            }
+          />
+
+          {/* Route for the Login page. */}
+          <Route
+            path="/login"
+            element={
+              user ? (
+                // If a user is logged in, redirect to homepage.
+                <Navigate to="/" />
+              ) : (
+                // Otherwise, show the LoginView.
+                <Col md={5}>
+                  <LoginView onLoggedIn={onLoginSuccessHandler} />
+                </Col>
+              )
+            }
+          />
+
+          {/* Route for displaying a single movie's details. */}
+          {/* ":movieId" is a URL parameter that will hold the ID of the movie. */}
+          <Route
+            path="/movies/:movieId"
+            element={
+              !user ? (
+                // If no user is logged in, redirect to the login page.
+                // `replace` ensures the login page doesn't get added to history if redirected.
+                <Navigate to="/login" replace />
+              ) : loading && movies.length === 0 ? (
+                // If loading initial movie data for the first time.
+                <Col className="text-center mt-5">
+                  <Spinner animation="border" variant="primary" />
+                  <p className="loading-message">Loading movie details...</p>
+                </Col>
+              ) : movies.length === 0 ? (
+                // If movie list is empty (and not loading).
+                <Col>
+                  <Alert variant="info">
+                    The movie list is currently empty.
+                  </Alert>
+                </Col>
+              ) : (
+                // If user is logged in and movies are available, show MovieView.
+                // Pass the full movies array so MovieView can find the correct movie.
+                <MovieView movies={movies} />
+              )
+            }
+          />
+
+          {/* Route for the main page (homepage), displaying the list of all movies. */}
+          <Route
+            path="/"
+            element={
+              !user ? (
+                // If no user, redirect to login.
+                <Navigate to="/login" replace />
+              ) : loading ? (
+                // Show a spinner while movies are loading.
+                <Col className="text-center mt-5">
+                  <Spinner animation="border" variant="primary" />
+                  <p className="loading-message">Loading movies...</p>
+                </Col>
+              ) : movies.length === 0 ? (
+                // If no movies are found after loading.
+                <Col>
+                  <Alert variant="info" className="empty-list-message">
+                    No movies available at the moment.
+                  </Alert>
+                </Col>
+              ) : error ? (
+                // Display error if fetching movies failed
+                <Col md={8}>
+                  <Alert variant="danger">
+                    <Alert.Heading>Error Loading Movies</Alert.Heading>
+                    <p>{error}</p>
+                  </Alert>
+                </Col>
+              ) : (
+                // If user is logged in and movies are loaded, display them.
+                // Use responsive column sizes for the movie cards.
+                movies.map((movie) => (
+                  <Col
+                    className="mb-4"
+                    key={movie._id}
+                    xs={12}
+                    sm={6}
+                    md={4}
+                    lg={3}
+                  >
+                    <MovieCard movie={movie} />
+                  </Col>
+                ))
+              )
+            }
+          />
+        </Routes>
       </Row>
-    </>
+    </BrowserRouter>
   );
 };
 
-export default MainView; // Default export
+export default MainView;
 
 /*
-This MainView component is the central hub of the application.
-It manages core application state including the current user, authentication token,
-list of movies, selected movie details, loading status, and error messages.
-I also:
-- Handles user authentication: loads user/token from localStorage, provides login/logout.
-- Fetches movie data from an API when a user is authenticated (token is present).
-- Conditionally renders different views:
-    - LoginView or SignupView if the user is not authenticated.
-    - A loading indicator (Spinner) while data is being fetched.
-    - An error message (Alert) if API calls or other operations fail.
-    - A list of MovieCards if movies are loaded and no specific movie is selected.
-    - MovieView (detailed view) if a movie is selected from the list.
-    - A message if no movies are available.
-- Uses React Bootstrap components (Row, Col, Button, Spinner, Alert) for layout and UI.
-- The movie list is displayed in a responsive grid.
-- A common header provides the app title and a logout button when the user is logged in.
+This MainView component serves as the primary container for the application,
+managing overall application state like user authentication, movie data, loading, and errors.
+With the integration of React Router:
+- It uses `<BrowserRouter>` to enable client-side navigation.
+- A `<NavigationBar>` is included for consistent navigation.
+- `<Routes>` and `<Route>` components define the application's different "pages" or views:
+    - `/signup` for user registration.
+    - `/login` for user login.
+    - `/movies/:movieId` for displaying detailed information about a single movie. The `:movieId` part
+      is a dynamic segment that captures the movie's ID from the URL.
+    - `/` (the root path) for displaying the main list of movies to logged-in users.
+- The `<Navigate>` component handles redirection, for example, protecting routes by sending
+  unauthenticated users to the login page, or redirecting logged-in users away from login/signup pages.
+- State variables like `selectedMovie` and `showSignup` are removed, as their functionality is
+  now handled by the routing system (i.e., the current URL determines the view).
+- The `movies` array is fetched and passed down to `MovieView` which then uses the URL parameter
+  (`movieId`) to find and display the specific movie.
+- Movie cards are rendered in a responsive grid on the homepage.
 */
