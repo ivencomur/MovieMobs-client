@@ -1,72 +1,77 @@
+// Import shared SCSS variables for consistent theming.
 @import '../../variables.scss';
-.login-view {
-  padding: 30px;
-  max-width: 450px;
-  margin: 50px auto;
-  border: 1px solid $card-border-color;
+
+// Styles for the main container of the login view.
+.login-view-container {
+  padding: 30px; 
+  max-width: 450px; 
+  margin: 50px auto; // Centers the box on the page with top/bottom margin
+  border: 1px solid $card-border-color; 
   border-radius: 8px;
-  text-align: center;
-  background-color: $card-background-color;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+  text-align: center; 
+  background-color: $card-background-color; // Background color from shared variables
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); 
 
-  h2 {
-    color: $primary-color;
-    margin-bottom: 1.5rem;
-    margin-top: 0;
-    font-size: 1.6rem;
+  // Styles for the main title ("Login") of the form.
+  .form-title {
+    color: $primary-color; 
+    margin-bottom: 1.5rem; // Space below the title
+    margin-top: 0; 
+    font-size: 1.6rem; // Sets the font size, similar to an h2
+    font-weight: bold; 
   }
-}
 
-.login-form {
-  .form-group {
-    margin-bottom: 15px;
-    text-align: left;
+  // Styles for the form element itself.
+  .login-form {
+    // Styles for groups of labels and inputs.
+    .form-group {
+      margin-bottom: 15px; 
+      text-align: left; 
 
-    label {
-      display: block;
-      margin-bottom: 5px;
-      font-weight: bold;
-      color: $secondary-color;
-    }
+      // Styles for form labels (e.g., "Username:", "Password:").
+      label {
+        display: block; // Makes the label take up its own line
+        margin-bottom: 5px;  
+        font-weight: bold; 
+        color: $secondary-color; // Uses the secondary theme color for labels
+      }
 
-    input[type="text"],
-    input[type="password"] {
-      padding: 10px;
-      width: 100%;
-      box-sizing: border-box;
-      border: 1px solid $input-border-color;
-      border-radius: 4px;
-      font-size: 1rem;
-      transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-
-      &:focus {
-        border-color: $input-focus-border-color;
-        outline: 0;
-        box-shadow: $input-focus-box-shadow;
+      // Styles for input fields (React Bootstrap Form.Control).
+      .form-control {
+        padding: 10px; 
+        border: 1px solid $input-border-color; // Border color from shared variables
+        border-radius: 4px; 
+        font-size: 1rem; // Font size for text inside inputs
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;   
+        // Styles for when an input field is clicked into.
+        &:focus {
+          border-color: $input-focus-border-color; // Changes border color on focus
+          outline: 0; // Removes the default browser outline
+          box-shadow: $input-focus-box-shadow; // Adds a glow effect using shared variables
+        }
       }
     }
-  }
 
-  .login-button {
-    background-color: $button-bg-color;
-    color: $button-text-color;
-    border-radius: 5px;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-    font-size: 1.1rem;
-    font-weight: bold;
-    transition: background-color 0.3s ease;
-    font-family: inherit;
-    margin-top: 10px;
-
-    &:hover {
-      background-color: $button-hover-bg-color;
-    }
-
-    &:disabled {
-      background-color: #6c757d;
-      cursor: not-allowed;
+    // Styles for the submit button.
+    .submit-button {
+      border-radius: 5px; 
+      padding: 10px 20px; 
+      cursor: pointer; 
+      font-size: 1.1rem; // Font size for button text
+      font-weight: bold; // Makes button text bold
+      transition: background-color 0.3s ease; 
+      font-family: inherit; // Ensures button uses the same font as the rest of the app
+      margin-top: 10px; 
     }
   }
 }
+
+/*
+This SCSS file provides specific styling for the LoginView component.
+It defines the appearance of the main login container, including its size,
+centering, border, background, and shadow, using variables from `_variables.scss`.
+The form title, labels, input fields (Form.Control), and the submit button
+are styled to match the application's theme, ensuring consistency.
+Focus states for inputs are also defined for better user experience.
+This file works in tandem with the themed Bootstrap styles from `index.scss`.
+*/

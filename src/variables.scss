@@ -1,14 +1,33 @@
-$primary-color: #155da0;
-$secondary-color: #048673;
-$accent-color: #f88f1f;
-$text-color: #333;
-$background-color: #f9f9f9;
-$card-background-color: #ffffff;
-$card-border-color: #dee2e6;
-$button-bg-color: #007bff;
-$button-hover-bg-color: #0056b3;
-$button-text-color: white;
+// Main theme colors for the application
+$primary-color: #155da0; // Used for primary actions, links, and highlights
+$secondary-color: #048673; // Used for secondary elements and accents
+$accent-color: #f88f1f; // Used for special highlights or calls to action
+
+// Standard text and background colors
+$text-color: #333; // Default color for most text content
+$background-color: #f9f9f9; // Main background color for the body
+
+// Card specific colors
+$card-background-color: #ffffff; // Background for card-like elements
+$card-border-color: #dee2e6; // Border color for cards and similar containers
+
+// Button specific colors (can be overridden by Bootstrap variants)
+$button-bg-color: #007bff; // A general button background color
+$button-hover-bg-color: #0056b3; // Hover state for general buttons
+$button-text-color: white; // Text color for general buttons
+
+// Color for error messages and indicators
 $error-color: #dc3545;
-$input-border-color: #ced4da;
-$input-focus-border-color: #86b7fe;
-$input-focus-box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+
+// Input field specific colors for forms
+$input-border-color: #ced4da; // Border for input fields
+$input-focus-border-color: #86b7fe; // Border for focused input fields
+$input-focus-box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25); // Glow effect for focused inputs
+
+/*
+This SCSS file defines all the core color variables used throughout the application.
+It centralizes the color palette, making it easy to update the theme consistently.
+Variables cover primary, secondary, accent colors, text, backgrounds, cards, buttons,
+error states, and form input styling. These variables are then used in other SCSS files,
+including the Bootstrap overrides in index.scss, to ensure a unified look and feel.
+*/
