@@ -1,72 +1,78 @@
+// Import shared SCSS variables for consistent theming.
 @import '../../variables.scss';
-.signup-view {
-  padding: 30px;
-  max-width: 450px;
-  margin: 50px auto;
-  border: 1px solid $card-border-color;
-  border-radius: 8px;
-  text-align: center;
-  background-color: $card-background-color;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 
-  h2 {
-    color: $primary-color;
-    margin-bottom: 1.5rem;
-    margin-top: 0;
-    font-size: 1.6rem;
+// Styles for the main container of the signup view.
+.signup-view-container {
+  padding: 30px; // Inner spacing for the container
+  max-width: 450px; 
+  margin: 50px auto; 
+  border: 1px solid $card-border-color; // Border using a shared variable
+  border-radius: 8px; 
+  text-align: center; 
+  background-color: $card-background-color; // Background color from shared variables
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); 
+
+  // Styles for the main title ("Sign Up") of the form.
+  .form-title {
+    color: $primary-color; // Uses the primary theme color for the text
+    margin-bottom: 1.5rem; // Space below the title
+    margin-top: 0; 
+    font-size: 1.6rem; // Sets the font size, similar to an h2
+    font-weight: bold; 
   }
-}
 
-.signup-form {
-  .form-group {
-    margin-bottom: 15px;
-    text-align: left;
+  // Styles for the form element itself.
+  .signup-form {
+    // Styles for groups of labels and inputs.
+    .form-group {
+      margin-bottom: 15px; 
+      text-align: left; 
 
-    label {
-      display: block;
-      margin-bottom: 5px;
-      font-weight: bold;
-      color: $secondary-color;
-    }
+      // Styles for form labels.
+      label {
+        display: block; // Makes the label take up its own line
+        margin-bottom: 5px; 
+        font-weight: bold; 
+        color: $secondary-color; 
+      }
 
-    input[type="text"],
-    input[type="password"] {
-      padding: 10px;
-      width: 100%;
-      box-sizing: border-box;
-      border: 1px solid $input-border-color;
-      border-radius: 4px;
-      font-size: 1rem;
-      transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+      // Styles for input fields (React Bootstrap Form.Control).
+      .form-control {
+        padding: 10px; 
+        border: 1px solid $input-border-color; // Border color from shared variables
+        border-radius: 4px; 
+        font-size: 1rem; // Font size for text inside inputs
+        transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out; 
 
-      &:focus {
-        border-color: $input-focus-border-color;
-        outline: 0;
-        box-shadow: $input-focus-box-shadow;
+        // Styles for when an input field is focused (clicked into).
+        &:focus {
+          border-color: $input-focus-border-color; // Changes border color on focus
+          outline: 0; // Removes the default browser outline
+          box-shadow: $input-focus-box-shadow; // Adds a glow effect using shared variables
+        }
       }
     }
-  }
 
-  .signup-button {
-    background-color: $button-bg-color;
-    color: $button-text-color;
-    border-radius: 5px;
-    border: none;
-    padding: 10px 20px;
-    cursor: pointer;
-    font-size: 1.1rem;
-    font-weight: bold;
-    transition: background-color 0.3s ease;
-    font-family: inherit;
-    margin-top: 10px;
-
-    &:hover {
-      background-color: $button-hover-bg-color;
-    }
-
-    &:disabled {
-      background-color: #6c757d;
-      cursor: not-allowed;
+    // Styles for the submit button.
+    .submit-button {
+      border-radius: 5px; 
+      padding: 10px 20px; 
+      cursor: pointer; // Changes cursor to a pointer on hover
+      font-size: 1.1rem; 
+      font-weight: bold; 
+      transition: background-color 0.3s ease; 
+      font-family: inherit; 
+      margin-top: 10px; 
     }
   }
 }
+
+/*
+This SCSS file styles the SignupView component, ensuring it looks consistent with the LoginView.
+It defines the appearance of the main signup container (size, centering, border, background, shadow)
+using shared variables from `_variables.scss`.
+The form title, labels, input fields (Form.Control), and the submit button
+are styled to match the application's overall theme.
+Input focus states are also defined for a better user experience.
+This file complements the themed Bootstrap styles provided by `index.scss`.
+*/
