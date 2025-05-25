@@ -1,6 +1,6 @@
 import React from "react";
 import PropTypes from "prop-types";
-// Import React Bootstrap components.
+// Import React Bootstrap components for layout and UI.
 import {
   Button,
   Image,
@@ -13,16 +13,32 @@ import {
 // Import useParams to access URL parameters and Link for navigation.
 import { useParams, Link } from "react-router-dom";
 
-export const MovieView = ({ movies }) => {
+// Placeholder function for handling add/remove favorites.
+// In a real app, this logic would involve API calls and state updates.
+const handleToggleFavorite = (movieId, movieTitle, isFavorite) => {
+  if (isFavorite) {
+    alert(
+      `Placeholder: Removed "${movieTitle}" (ID: ${movieId}) from favorites!`
+    );
+    // Call removeFavoriteMovie(user.Username, movieId, token) here
+  } else {
+    alert(`Placeholder: Added "${movieTitle}" (ID: ${movieId}) to favorites!`);
+    // Call addFavoriteMovie(user.Username, movieId, token) here
+  }
+  // After API call, update user state in MainView/context.
+};
+
+export const MovieView = ({ movies, user, token }) => {
+  // Added user and token for favorite logic
   // The `useParams` hook retrieves URL parameters. Here, we get `movieId`.
   const { movieId } = useParams();
 
   // Find the specific movie from the `movies` array using the `movieId` from the URL.
   const movie = movies.find((m) => m._id === movieId);
 
-  // Handles image loading errors.
+  // Handles image loading errors by setting a fallback placeholder.
   const handleImageError = (e) => {
-    e.target.onerror = null;
+    e.target.onerror = null; // Prevents infinite loop
     e.target.src =
       "https://via.placeholder.com/350x525.png?text=Image+Not+Available";
     e.target.alt = "Image not available";
@@ -52,6 +68,9 @@ export const MovieView = ({ movies }) => {
   // Determine image path, using a placeholder if not available.
   const imagePath =
     movie.ImagePath || "https://via.placeholder.com/350x525.png?text=No+Image";
+  // Check if the current movie is in the user's favorites (requires user prop).
+  const isFavorite =
+    user && user.FavoriteMovies && user.FavoriteMovies.includes(movie._id);
 
   return (
     // Main container for the movie details view.
@@ -71,18 +90,19 @@ export const MovieView = ({ movies }) => {
             src={imagePath}
             alt={`Poster for ${movie.Title}`}
             onError={handleImageError}
-            style={{ maxHeight: "525px", width: "auto" }}
+            style={{ maxHeight: "525px", width: "auto" }} // Constrain image size
           />
         </Col>
 
         <Col md={8} className="movie-details">
+          {/* Movie title. */}
           <h2 className="movie-view-title">{movie.Title}</h2>
-          <hr />
-
+          <hr /> {/* Horizontal line for separation */}
+          {/* Movie description. */}
           <div className="movie-detail mb-2">
             <strong>Description:</strong> {movie.Description}
           </div>
-
+          {/* Movie genre with a Bootstrap Badge for styling. */}
           <div className="movie-detail mb-2">
             <strong>Genre:</strong>
             <Badge bg="info" text="dark" className="ms-2">
@@ -92,7 +112,7 @@ export const MovieView = ({ movies }) => {
                 : movie.Genre || "N/A"}
             </Badge>
           </div>
-
+          {/* Movie director information. */}
           <div className="movie-detail mb-2">
             <strong>Director:</strong>
             {/* Handle cases where Director might be a string or an object */}
@@ -107,14 +127,15 @@ export const MovieView = ({ movies }) => {
               </em>
             )}
           </div>
-
+          {/* Featured status. */}
           <div className="movie-detail mb-3">
             <strong>Featured:</strong> {movie.Featured ? "Yes" : "No"}
           </div>
-
+          {/* Cast list, displayed if available. */}
           {Array.isArray(movie.Cast) && movie.Cast.length > 0 && (
             <>
               <h5>Cast:</h5>
+              {/* Bootstrap ListGroup for a clean list presentation. */}
               <ListGroup variant="flush" className="cast-list">
                 {movie.Cast.map((actorName, index) => (
                   <ListGroup.Item
@@ -127,21 +148,42 @@ export const MovieView = ({ movies }) => {
               </ListGroup>
             </>
           )}
+          {/* Favorite button - placeholder functionality */}
+          {user && ( // Only show if user is logged in
+            <div className="mt-3">
+              <Button
+                variant={isFavorite ? "outline-danger" : "outline-success"}
+                onClick={() =>
+                  handleToggleFavorite(movie._id, movie.Title, isFavorite)
+                }
+              >
+                {isFavorite ? "💔 Unfavorite" : "❤️ Favorite"}
+              </Button>
+            </div>
+          )}
         </Col>
       </Row>
+      {/* Placeholder for Similar Movies section (Bonus) */}
+      {/* <Row className="mt-5">
+        <Col>
+          <h4>Similar Movies (Bonus Feature Placeholder)</h4>
+          {/* Logic to find and display similar movies would go here, possibly using MovieCard */}
+      {/* </Row> */}
     </div>
   );
 };
 
-// Update prop types: `movies` is now an array, `onBackClick` is removed.
+// Define prop types for the component.
 MovieView.propTypes = {
   movies: PropTypes.arrayOf(
     PropTypes.shape({
+      // Expects the full array of movies
       _id: PropTypes.string.isRequired,
       Title: PropTypes.string.isRequired,
       Description: PropTypes.string.isRequired,
       ImagePath: PropTypes.string,
       Genre: PropTypes.oneOfType([
+        // Genre can be a string or an object with a name
         PropTypes.string,
         PropTypes.shape({
           name: PropTypes.string,
@@ -149,6 +191,7 @@ MovieView.propTypes = {
         }),
       ]),
       Director: PropTypes.oneOfType([
+        // Director can be a string or an object with name/bio
         PropTypes.string,
         PropTypes.shape({ name: PropTypes.string, bio: PropTypes.string }),
       ]),
@@ -156,20 +199,42 @@ MovieView.propTypes = {
       Cast: PropTypes.arrayOf(PropTypes.string),
     })
   ).isRequired,
+  user: PropTypes.object, // User object is needed for favorite status; can be null
+  token: PropTypes.string, // Token might be needed for API calls to add/remove favorites
+  // onBackClick prop is removed; navigation is handled by React Router <Link>
 };
 
 /*
-The MovieView component now dynamically displays movie details based on a URL parameter.
-Key changes include:
-- It imports `useParams` and `Link` from `react-router-dom`.
-- It accepts the full `movies` array as a prop (passed from MainView).
-- `useParams()` hook is called to extract the `movieId` from the current URL path
-  (e.g., if the URL is `/movies/123`, `movieId` will be "123").
-- It uses `movies.find()` to get the specific movie object whose `_id` matches the `movieId`.
-- If no movie is found (e.g., invalid ID in URL or data still loading), it displays a
-  "Movie Not Found" message with a `<Link>` to go back to the main list.
-- The "Back" button is now a `<Link to="/">` component, directly navigating to the homepage.
-- The `onBackClick` prop is removed, as its functionality is replaced by the `<Link>` component.
-- Prop types are updated to reflect that `movies` is an array.
-- Updated Genre and Director display to handle cases where these might be simple strings or objects with a 'name' property, depending on how movie data is structured in the `movies` array.
+These comments intend to provide a self-learning feedback for me as a student
+to be able to revisit, review, and comprehend their gist whenever these type
+of scripts can be reused as a pattern again. I apologize for the inconveniences they might cause:
+
+MovieView component displays detailed info for a single movie selected via URL.
+
+1. Props:
+   - `movies`: array of movie objects (full list)
+   - `user`: current user object (for favorites)
+   - `token`: auth token (for API calls, placeholder here)
+
+2. Uses React Router `useParams` hook to extract `movieId` from URL.
+
+3. Finds the movie in the `movies` array by matching `_id` with `movieId`.
+
+4. If movie not found, displays a centered warning Alert with a "Back to Movie List" button (React Router Link).
+
+5. Displays movie details in a responsive layout using React Bootstrap components:
+   - Poster image with fallback placeholder on error
+   - Title, Description, Genre (string or object), Director (string or object with optional bio)
+   - Featured status ("Yes"/"No")
+   - Cast list as a Bootstrap ListGroup if available
+
+6. Shows a "Back to List" button using React Router `<Link>` for navigation.
+
+7. Includes a placeholder "❤️ Favorite"/"💔 Unfavorite" button that toggles favorite status via alerts.
+   Actual add/remove favorite logic would use `user`, `token`, and API calls.
+
+8. PropTypes validate shape of movies array and optional user/token props.
+
+Summary:
+This component ties routing, data lookup, and detailed presentation together, providing a full movie view with navigation and user interaction placeholders.
 */

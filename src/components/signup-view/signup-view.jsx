@@ -5,7 +5,7 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Alert from "react-bootstrap/Alert";
 // Import component-specific styles.
-import './signup-view.scss';
+import "./signup-view.scss";
 // Import API functions for signup and login.
 import { login, signupUser } from "../../movies-api";
 
@@ -18,7 +18,7 @@ export const SignupView = ({ onLoggedIn }) => {
   const [error, setError] = useState(null);
 
   // Handle form submission for user signup.
-  const handleSubmit = async(event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault(); // Prevent default browser submission
     setIsLoading(true); // Indicate loading process
     setError(null); // Clear previous errors
@@ -36,11 +36,15 @@ export const SignupView = ({ onLoggedIn }) => {
             onLoggedIn(loginResponse.user, loginResponse.token);
           }
         } else {
-          setError("Signup successful, but automatic login failed. Please try logging in manually.");
+          setError(
+            "Signup successful, but automatic login failed. Please try logging in manually."
+          );
         }
       } else {
         // Handle signup failure.
-        setError(signupResponse.message || "Signup failed. Please check your details.");
+        setError(
+          signupResponse.message || "Signup failed. Please check your details."
+        );
       }
     } catch (error) {
       // Catch any errors during API calls.
@@ -58,8 +62,12 @@ export const SignupView = ({ onLoggedIn }) => {
         {/* Form title. */}
         <h2 className="mb-4 text-center form-title">Sign Up</h2>
         {/* Display error messages if any. */}
-        {error && <Alert variant="danger" className="text-center">{error}</Alert>}
-        
+        {error && (
+          <Alert variant="danger" className="text-center">
+            {error}
+          </Alert>
+        )}
+
         {/* Username input field group. */}
         <Form.Group controlId="signupUsername" className="mb-3">
           <Form.Label>Username</Form.Label>
@@ -101,10 +109,10 @@ export const SignupView = ({ onLoggedIn }) => {
         </Form.Group>
 
         {/* Submit button. */}
-        <Button 
+        <Button
           variant="success" // Uses themed success color (mapped to secondary theme color)
-          type="submit" 
-          disabled={isLoading} 
+          type="submit"
+          disabled={isLoading}
           className="w-100 submit-button" // Full-width and custom class
         >
           {isLoading ? "Signing up..." : "Sign Up"}
@@ -120,12 +128,42 @@ SignupView.propTypes = {
 };
 
 /*
-This component provides the user signup form.
-It manages state for username, email, password, loading, and errors.
-React Bootstrap's Form, Button, and Alert components are used for the UI.
-When submitted, it calls an API to create a new user and then attempts to log them in.
-If successful, it triggers the `onLoggedIn` prop. Errors are displayed in an Alert.
-Styling is handled by `signup-view.scss` and Bootstrap utilities, under a consistent look
-with the LoginView. The `.signup-view-container`, `.form-title`, and `.submit-button` classes
-are available for specific SCSS styling.
+These comments intend to provide a self-learning feedback for me as a student
+to be able to revisit, review, and comprehend their gist whenever these type
+of scripts can be reused as a pattern again. I apologize for the inconveniences they might cause:
+
+SignupView component (lines 1-69):
+
+- Lines 1-7: Imports React, PropTypes, React Bootstrap components (Form, Button, Alert), styles, and API functions (`login`, `signupUser`).
+
+- Lines 9-63: Defines the SignupView functional component with internal state for:
+  - `username`, `email`, `password` (lines 10-12)
+  - `isLoading` to track submission state (line 13)
+  - `error` for error messages (line 14)
+
+- Lines 16-42: `handleSubmit` async function triggered on form submission:
+  - Prevents default form action (line 17).
+  - Sets loading true and clears previous errors (lines 18-19).
+  - Calls `signupUser` API with form data (line 22).
+  - If signup is successful (user object with `_id` returned, line 24), attempts automatic login (line 26).
+  - On successful login, calls the `onLoggedIn` callback prop with user and token (lines 27-31).
+  - Handles signup or login failure by setting error messages (lines 33-37).
+  - Catches unexpected errors (lines 38-40).
+  - Finally, resets loading to false (line 41).
+
+- Lines 44-62: JSX rendering the signup form:
+  - Container div with padding and styling (line 44).
+  - React Bootstrap `<Form>` with controlled inputs for username, email, and password (lines 46-60).
+    - Inputs are disabled during loading to prevent interaction.
+    - Validation includes required fields and minimum username length (line 53).
+  - Displays error alert if `error` is set (line 49).
+  - Submit button shows "Signing up..." when loading (lines 61-62).
+
+- Lines 66-69: Defines `propTypes` requiring an `onLoggedIn` function prop to notify parent component on successful login.
+
+Styling:
+- Uses custom SCSS file `signup-view.scss`.
+- Applies classes like `.signup-view-container`, `.form-title`, and `.submit-button` for consistent styling and layout.
+
+This component manages user signup flow with loading and error states, ensuring smooth UX by attempting automatic login after registration.
 */

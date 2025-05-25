@@ -1,12 +1,13 @@
-
 import React, { useState, useEffect, useCallback } from "react";
-// Import child components.
+// Import reusable UI components from other files.
 import { MovieCard } from "../movie-card/movie-card";
 import { MovieView } from "../movie-view/movie-view";
 import { LoginView } from "../login-view/login-view";
 import { SignupView } from "../signup-view/signup-view";
-import { NavigationBar } from "../navigation-bar/navigation-bar"; // Import NavigationBar
-// Import React Bootstrap components.
+import { NavigationBar } from "../navigation-bar/navigation-bar";
+import { ProfileView } from "../user-profile-view/user-profile-view"; // User profile view
+
+// Import layout and UI components from React-Bootstrap (for styling/layout).
 import {
   Row,
   Col,
@@ -14,37 +15,42 @@ import {
   Spinner,
   Alert,
 } from "react-bootstrap";
-// Import React Router components.
+
+// Import routing components from React Router (to handle page navigation).
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
-// Define the base URL for the movie API.
+// Base URL to contact the movie database API.
 const API_BASE_URL = "https://iecm-movies-app-6966360ed90e.herokuapp.com";
 
+// Main component that controls the logic and display of the entire app.
 export const MainView = () => {
-  // Attempt to load user and token from localStorage on initial render.
+  // Load saved login data (if available) from browser storage.
   const storedUser = JSON.parse(localStorage.getItem("user"));
   const storedToken = localStorage.getItem("token");
 
-  // State variables for user, token, movies, loading, and errors.
+  // Define the app’s state: user info, token, movie list, loading status, and error messages.
   const [user, setUser] = useState(storedUser ? storedUser : null);
   const [token, setToken] = useState(storedToken ? storedToken : null);
   const [movies, setMovies] = useState([]);
-  // selectedMovie state is removed; routing handles which movie to view.
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  // showSignup state is removed; navigation to signup is handled by its route.
 
-  // Callback function to handle user logout.
+  // Function to log the user out and clear stored data.
   const handleLogout = useCallback(() => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
     setToken(null);
     setUser(null);
-    // movies and selectedMovie will clear or become irrelevant due to logged-out state.
     setError(null);
   }, []);
 
-  // Callback function for successful login.
+  // Update the user data when changes happen in ProfileView.
+  const handleUserUpdate = (updatedUser) => {
+    setUser(updatedUser);
+    localStorage.setItem("user", JSON.stringify(updatedUser));
+  };
+
+  // When login is successful, save the token and user in state and localStorage.
   const onLoginSuccessHandler = useCallback((loggedInUser, receivedToken) => {
     if (receivedToken) {
       localStorage.setItem("token", receivedToken);
@@ -54,13 +60,13 @@ export const MainView = () => {
       localStorage.setItem("user", JSON.stringify(loggedInUser));
       setUser(loggedInUser);
     }
-    setError(null); // Clear any previous login/signup errors
+    setError(null);
   }, []);
 
-  // useEffect hook to fetch movies when the token changes.
+  // When token changes, fetch movies from the server and update the movie list.
   useEffect(() => {
     if (!token) {
-      setMovies([]); // Clear movies if no token
+      setMovies([]);
       setLoading(false);
       return;
     }
@@ -73,9 +79,10 @@ export const MainView = () => {
     })
       .then(async (response) => {
         if (response.status === 401) {
-          handleLogout(); // If unauthorized, log out
+          handleLogout();
           throw new Error("Session expired. Please log in again.");
         }
+
         if (!response.ok) {
           const errorBodyText = await response.text();
           let errorMsg = `Failed to fetch movies (Status: ${response.status})`;
@@ -89,16 +96,17 @@ export const MainView = () => {
           }
           throw new Error(errorMsg);
         }
+
         return response.json();
       })
       .then((data) => {
-        // Map API data to the structure expected by components.
+        // Normalize movie data to ensure consistent format.
         const moviesFromApi = data.map((movie) => ({
-          _id: movie._id, // Crucial for keys and route parameters
+          _id: movie._id,
           Title: movie.Title || movie.title,
           Description: movie.Description || movie.description,
-          Genre: movie.Genre, // Assumes Genre is an object { name, description } or string
-          Director: movie.Director, // Assumes Director is an object { name, bio } or string
+          Genre: movie.Genre,
+          Director: movie.Director,
           ImagePath: movie.ImagePath || movie.imagePath,
           Featured: movie.Featured || movie.featured || false,
           Cast: movie.Actors
@@ -119,29 +127,31 @@ export const MainView = () => {
       .finally(() => {
         setLoading(false);
       });
-  }, [token, handleLogout]); // Dependencies: token and handleLogout
+  }, [token, handleLogout]);
 
+  // This is the element actually rendered on the screen — it sets up routes and components.
   return (
-    // BrowserRouter enables routing capabilities for the components within it.
     <BrowserRouter>
-      {/* NavigationBar provides consistent navigation across views. */}
+      {/* Always show the navigation bar */}
       <NavigationBar user={user} onLoggedOut={handleLogout} />
 
-      {/* Main content area, typically within a Bootstrap Row for layout. */}
       <Row className="justify-content-md-center mt-4">
-        {" "}
-        {/* Added mt-4 for spacing below navbar */}
-        {/* Routes define which component to render based on the current URL path. */}
+        {/* Show login-related error if user is not logged in */}
+        {error && !user && (
+          <Col md={8}>
+            {" "}
+            <Alert variant="danger">{error}</Alert>{" "}
+          </Col>
+        )}
+
         <Routes>
-          {/* Route for the Signup page. */}
+          {/* Signup route — visible only when user is not logged in */}
           <Route
             path="/signup"
             element={
               user ? (
-                // If a user is already logged in, redirect them to the homepage.
                 <Navigate to="/" />
               ) : (
-                // Otherwise, show the SignupView.
                 <Col md={5}>
                   <SignupView onLoggedIn={onLoginSuccessHandler} />
                 </Col>
@@ -149,15 +159,13 @@ export const MainView = () => {
             }
           />
 
-          {/* Route for the Login page. */}
+          {/* Login route — same logic as signup */}
           <Route
             path="/login"
             element={
               user ? (
-                // If a user is logged in, redirect to homepage.
                 <Navigate to="/" />
               ) : (
-                // Otherwise, show the LoginView.
                 <Col md={5}>
                   <LoginView onLoggedIn={onLoginSuccessHandler} />
                 </Col>
@@ -165,58 +173,65 @@ export const MainView = () => {
             }
           />
 
-          {/* Route for displaying a single movie's details. */}
-          {/* ":movieId" is a URL parameter that will hold the ID of the movie. */}
+          {/* Profile route — shows user info and lets user update or deregister */}
+          <Route
+            path="/profile"
+            element={
+              !user ? (
+                <Navigate to="/login" replace />
+              ) : (
+                <ProfileView
+                  user={user}
+                  token={token}
+                  movies={movies}
+                  onUserUpdate={handleUserUpdate}
+                  onLoggedOut={handleLogout}
+                />
+              )
+            }
+          />
+
+          {/* Movie details route — shows info for one movie */}
           <Route
             path="/movies/:movieId"
             element={
               !user ? (
-                // If no user is logged in, redirect to the login page.
-                // `replace` ensures the login page doesn't get added to history if redirected.
                 <Navigate to="/login" replace />
               ) : loading && movies.length === 0 ? (
-                // If loading initial movie data for the first time.
                 <Col className="text-center mt-5">
                   <Spinner animation="border" variant="primary" />
                   <p className="loading-message">Loading movie details...</p>
                 </Col>
               ) : movies.length === 0 ? (
-                // If movie list is empty (and not loading).
                 <Col>
                   <Alert variant="info">
                     The movie list is currently empty.
                   </Alert>
                 </Col>
               ) : (
-                // If user is logged in and movies are available, show MovieView.
-                // Pass the full movies array so MovieView can find the correct movie.
                 <MovieView movies={movies} />
               )
             }
           />
 
-          {/* Route for the main page (homepage), displaying the list of all movies. */}
+          {/* Main page — shows all movies as cards */}
           <Route
             path="/"
             element={
               !user ? (
-                // If no user, redirect to login.
                 <Navigate to="/login" replace />
               ) : loading ? (
-                // Show a spinner while movies are loading.
                 <Col className="text-center mt-5">
                   <Spinner animation="border" variant="primary" />
                   <p className="loading-message">Loading movies...</p>
                 </Col>
               ) : movies.length === 0 ? (
-                // If no movies are found after loading.
                 <Col>
                   <Alert variant="info" className="empty-list-message">
-                    No movies available at the moment.
+                    No movies available.
                   </Alert>
                 </Col>
               ) : error ? (
-                // Display error if fetching movies failed
                 <Col md={8}>
                   <Alert variant="danger">
                     <Alert.Heading>Error Loading Movies</Alert.Heading>
@@ -224,8 +239,7 @@ export const MainView = () => {
                   </Alert>
                 </Col>
               ) : (
-                // If user is logged in and movies are loaded, display them.
-                // Use responsive column sizes for the movie cards.
+                // Display each movie in a card format
                 movies.map((movie) => (
                   <Col
                     className="mb-4"
@@ -250,22 +264,40 @@ export const MainView = () => {
 export default MainView;
 
 /*
-This MainView component serves as the primary container for the application,
-managing overall application state like user authentication, movie data, loading, and errors.
-With the integration of React Router:
-- It uses `<BrowserRouter>` to enable client-side navigation.
-- A `<NavigationBar>` is included for consistent navigation.
-- `<Routes>` and `<Route>` components define the application's different "pages" or views:
-    - `/signup` for user registration.
-    - `/login` for user login.
-    - `/movies/:movieId` for displaying detailed information about a single movie. The `:movieId` part
-      is a dynamic segment that captures the movie's ID from the URL.
-    - `/` (the root path) for displaying the main list of movies to logged-in users.
-- The `<Navigate>` component handles redirection, for example, protecting routes by sending
-  unauthenticated users to the login page, or redirecting logged-in users away from login/signup pages.
-- State variables like `selectedMovie` and `showSignup` are removed, as their functionality is
-  now handled by the routing system (i.e., the current URL determines the view).
-- The `movies` array is fetched and passed down to `MovieView` which then uses the URL parameter
-  (`movieId`) to find and display the specific movie.
-- Movie cards are rendered in a responsive grid on the homepage.
+These comments intend to provide a self-learning feedback for me as a student
+to be able to revisit, review, and comprehend their gist whenever these type
+of scripts can be reused as a pattern again. I apologize for the inconveniences they might cause:
+
+MainView component controls app state, data fetching, and routing.
+
+1. Initializes user, token, movies, loading, and error states from localStorage or defaults.  
+   → Lines 19–29
+
+2. `handleLogout` clears localStorage and resets user/token/error state.  
+   → Lines 31–37
+
+3. `handleUserUpdate` updates user state and localStorage on profile changes.  
+   → Lines 39–42
+
+4. `onLoginSuccessHandler` saves user and token on successful login, clears errors.  
+   → Lines 44–54
+
+5. `useEffect` watches `token`:  
+   - If no token, clears movies and loading.  
+   - Otherwise, fetches movies from API with Authorization header.  
+   - Handles 401 errors by logging out, and other errors with detailed messages.  
+   - Normalizes movie data structure before saving to state.  
+   → Lines 56–104
+
+6. Renders UI inside React Router:  
+   - Always shows NavigationBar with user and logout handler.  
+   - Displays error Alert if login-related errors occur.  
+   - Defines routes for Signup, Login (redirect if logged in), Profile (redirect if not logged in), Movie details, and Main movie list.  
+   - Uses conditional rendering for loading states, errors, empty lists, and redirects.  
+   → Lines 106–169
+
+7. Uses React Bootstrap for layout (Row, Col), feedback (Spinner, Alert), and buttons.  
+   → Throughout JSX
+
+This structure keeps the app’s flow and state tightly managed, with clear user auth logic, error handling, and dynamic routing.
 */
