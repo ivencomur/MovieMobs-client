@@ -3,7 +3,7 @@ const API_BASE_URL = "https://iecm-movies-app-6966360ed90e.herokuapp.com";
 
 // Handle user login.
 export async function login(username, password) {
-  const loginData = { Username: username, Password: password }; // API expects these keys
+  const loginData = { username: username, password: password }; // API expects these keys
   let response = await fetch(`${API_BASE_URL}/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

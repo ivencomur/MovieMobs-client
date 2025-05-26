@@ -37,7 +37,7 @@ export const MovieCard = ({ movie }) => {
           variant="top"
           src={imagePath}
           alt={`Poster for ${movie.Title}`}
-          onError={handleImageError}
+          
           className="card-img-top"
         />
       </Link>

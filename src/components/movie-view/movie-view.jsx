@@ -89,7 +89,7 @@ export const MovieView = ({ movies, user, token }) => {
             className="movie-poster img-fluid rounded shadow"
             src={imagePath}
             alt={`Poster for ${movie.Title}`}
-            onError={handleImageError}
+            
             style={{ maxHeight: "525px", width: "auto" }} // Constrain image size
           />
         </Col>

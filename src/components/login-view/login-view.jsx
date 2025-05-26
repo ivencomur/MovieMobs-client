@@ -8,6 +8,7 @@ import Alert from "react-bootstrap/Alert";
 import "./login-view.scss";
 // Import the login API function.
 import { login } from "../../movies-api";
+import {Link} from "react-router-dom";
 
 export const LoginView = ({ onLoggedIn }) => {
   // State variables for form inputs, loading status, and error messages.
@@ -95,6 +96,8 @@ export const LoginView = ({ onLoggedIn }) => {
         >
           {isLoading ? "Logging in..." : "Login"}
         </Button>
+
+        <p>New to MoviesFlix? <Link to="/signup">Signup Now</Link></p>
       </Form>
     </div>
   );
