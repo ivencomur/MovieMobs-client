@@ -1,132 +1,131 @@
-// Import Bootstrap's core functions and variables to enable overrides.
 @import "~bootstrap/scss/functions";
 @import "~bootstrap/scss/variables";
 
-// Import the project's custom SCSS variables.
 @import "./variables.scss";
 
-// Override Bootstrap's default variables with project-specific values.
-// These overrides will theme Bootstrap components globally.
+// Override Bootstrap variables with project theme colors and fonts
 $primary: $primary-color;
 $secondary: $secondary-color;
-$success: $secondary-color; // Using secondary color for success states for consistency
-$info: darken($primary-color, 10%); // Slightly darker primary for informational elements
+$success: $secondary-color; // Consistent success color
+$info: darken($primary-color, 10%);
 $warning: $accent-color;
 $danger: $error-color;
-$light: $background-color; // Light backgrounds, not pure white
+$light: $background-color;
 $dark: $text-color;
 
-// Set global body background and text color using project variables.
 $body-bg: $background-color;
 $body-color: $text-color;
 
-// Define link colors.
 $link-color: $primary-color;
 $link-hover-color: darken($primary-color, 15%);
 
-// Define font families, using "Moderustic" as primary.
 $font-family-sans-serif: "Moderustic", "Roboto", sans-serif;
 $font-family-base: $font-family-sans-serif;
 $headings-font-family: "Moderustic", "Roboto", sans-serif;
 
-// Define global border radius and border colors.
-$border-radius: 0.3rem; // Default rounded corner size
-$border-color: $card-border-color; // Default border color for components
-$card-border-color: $card-border-color; // Specific for cards
+$border-radius: 0.3rem;
+$border-color: $card-border-color;
+$card-border-color: $card-border-color;
 
-// Define card background and header background colors.
 $card-bg: $card-background-color;
-$card-cap-bg: $background-color; // Card headers might use main background
+$card-cap-bg: $background-color;
 
-// Define default button background and text color (for non-variant buttons or base).
 $button-bg: $primary-color;
-$button-text-color: #ffffff; // From variables.scss (though variable is $button-text-color)
+$button-text-color: #ffffff;
 
-// Define input field styling variables.
-$input-border-color: $input-border-color; // From variables.scss
-$input-focus-border-color: $input-focus-border-color; // From variables.scss
-$form-control-focus-box-shadow: $input-focus-box-shadow; // From variables.scss
+$input-border-color: $input-border-color;
+$input-focus-border-color: $input-focus-border-color;
+$form-control-focus-box-shadow: $input-focus-box-shadow;
 
-// Import the full Bootstrap SCSS framework after all overrides.
 @import "~bootstrap/scss/bootstrap";
 
-// Global body styles.
 body {
-  // Font family, background, and text color are now primarily set by Bootstrap variables above.
-  padding-bottom: 80px; // Space at the bottom, possibly for a footer
-  margin: 0; // Ensure no default browser margins
+  padding-bottom: 80px; // Space for footer or fixed elements
+  margin: 0;
 }
 
-// Styles for loading and empty list messages.
 .loading-message,
 .empty-list-message {
   text-align: center;
   font-size: 1.2em;
-  color: $gray-600; // Using a Bootstrap gray color for muted text
+  color: $gray-600; // Muted text color
   margin-top: 40px;
 }
 
-// Global style for error messages (can be used by non-Alert component errors).
 .error-message {
-  color: $danger; // Uses the themed Bootstrap danger color
+  color: $danger;
   margin-bottom: 10px;
   text-align: center;
   font-size: 0.95em;
 }
 
-// Style for welcome messages.
 .welcome-message {
   text-align: center;
-  margin-bottom: 1.5rem; // Bootstrap spacing unit
-  color: $primary; // Uses the themed Bootstrap primary color
+  margin-bottom: 1.5rem;
+  color: $primary;
   font-size: 1.8rem;
-  font-weight: 500; // Medium font weight
+  font-weight: 500;
 }
 
-// Custom styles for movie cards, enhancing Bootstrap's Card component.
 .movie-card {
-  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; // Smooth hover effects
+  transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 
   &:hover {
-    transform: translateY(-5px); // Slight lift on hover
-    box-shadow: $box-shadow-lg !important; // Use Bootstrap's larger shadow for emphasis
+    transform: translateY(-5px);
+    box-shadow: $box-shadow-lg !important;
   }
 
   .card-title {
-    min-height: 2.5em; // Ensure space for at least two lines of title text
+    min-height: 2.5em; // Reserve space for multi-line titles
   }
 
-  // Styling for the image within the movie card.
   .card-img-top {
-    aspect-ratio: 2 / 3; // Maintain a consistent aspect ratio for posters
-    object-fit: cover; // Ensure image covers the area without distortion
-    background-color: $gray-200; // Placeholder background for images before they load
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+    background-color: $gray-200; // Placeholder background
   }
 }
 
-// Custom styles for the detailed movie view container.
 .movie-view-container {
-  // Main title within the movie view.
-  h2.movie-view-title { // More specific selector
-    color: $primary; // Use themed primary color
+  h2.movie-view-title {
+    color: $primary;
   }
 
-  // Styling for individual detail items (e.g., "Genre: Action").
   .movie-detail {
-    span:first-child { // The label part like "Genre:"
+    span:first-child {
       font-weight: bold;
-      color: $secondary; // Use themed secondary color
+      color: $secondary;
     }
   }
 }
 
-/*
-This SCSS file is the main stylesheet for the application.
-It starts by importing Bootstrap's functions and variables, then our custom project variables.
-Key Bootstrap SCSS variables are overridden with the API's theme colors, fonts, and other settings.
-This customizes the entire Bootstrap framework to match the application's design.
-After overrides, the full Bootstrap SCSS is imported.
-Finally, global custom styles for the body, messages, and specific component tweaks
-(like .movie-card and .movie-view-container) are defined.
-This way ensures a consistent theme across Bootstrap components and custom elements.
+/* 
+These comments intend to provide a self-learning feedback for me as a student
+to be able to revisit, review, and comprehend their gist whenever these type
+of scripts can be reused as a pattern again. I apologize for the inconveniences they might cause:
+
+Main SCSS overview (lines 1-92):
+
+- Imports Bootstrap core functions and variables for overrides (lines 1-4).
+- Imports project custom variables for theming (line 6).
+- Overrides Bootstrap variables with project colors, fonts, and styling (lines 8-49):
+  - Colors for primary, secondary, success, info, warning, danger, light, dark (lines 9-17).
+  - Body background and text color set globally (lines 19-20).
+  - Link colors defined with hover variations (lines 22-23).
+  - Fonts set using custom "Moderustic" font (lines 25-28).
+  - Border radius and colors for components and cards (lines 30-35).
+  - Card backgrounds and button defaults (lines 37-44).
+  - Input styling variables for borders and focus effects (lines 46-49).
+- Imports full Bootstrap SCSS framework after all overrides (line 51).
+- Global body styles: font, padding, margin (lines 53-59).
+- Styles for loading, empty list, error, and welcome messages with themed colors and spacing (lines 61-77).
+- Custom movie card styles with hover lift and shadow effects; image aspect ratio and placeholder background (lines 79-91).
+- Detailed movie view container styling with themed colors for titles and detail labels (lines 93-104).
+$success: $secondary-color; // Consistent success color across the app by reusing the secondary theme color
+
+
+Summary:
+- This file sets a global, consistent theme by combining Bootstrap’s base with custom colors, fonts, and component tweaks.
+- The overrides ensure all Bootstrap components align with the app’s design system.
+- Custom styles add polish and interactivity to specific UI elements like movie cards and detail views.
 */

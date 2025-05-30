@@ -1,70 +1,112 @@
 import React from "react";
 import PropTypes from "prop-types";
-// Import React Bootstrap Card component.
-import { Card } from "react-bootstrap";
+// Import React Bootstrap components.
+import { Card, Button } from "react-bootstrap";
+// Import Link from React Router for navigation.
+import { Link } from "react-router-dom";
 
-export const MovieCard = ({ movie, onMovieClick }) => {
-  // Handles image loading errors by setting a fallback placeholder.
+// Placeholder: This function would typically be passed as a prop or handled via context/state management.
+const handleAddToFavorites = (movieId, movieTitle) => {
+  alert(
+    `Placeholder: Added "${movieTitle}" (ID: ${movieId}) to favorites! API call would happen here.`
+  );
+  // In a real app, you'd call something like:
+  // addFavoriteMovie(currentUser.Username, movieId, token)
+  //   .then(updatedUser => { /* update user state/context */ })
+  //   .catch(err => console.error(err));
+};
+
+export const MovieCard = ({ movie }) => {
   const handleImageError = (e) => {
-    e.target.onerror = null; // Prevents infinite loop if placeholder also fails
+    e.target.onerror = null;
     e.target.src =
       "https://via.placeholder.com/300x450.png?text=Image+Not+Available";
     e.target.alt = "Image not available";
   };
 
-  // Determine the image path, using a placeholder if not available.
   const imagePath =
     movie.ImagePath || "https://via.placeholder.com/300x450.png?text=No+Image";
 
   return (
-    // Use Bootstrap Card component for styling.
-    // h-100 ensures cards in a row have equal height.
-    // movie-card class for custom SCSS tweaks.
-    // shadow-sm adds a subtle shadow.
-    <Card
-      className="h-100 movie-card shadow-sm"
-      onClick={() => onMovieClick(movie)} // Make the entire card clickable (Is it wrapped??)
-      style={{ cursor: "pointer" }} // Indicate clickability
-    >
-      {/* Movie poster image within the card. */}
-      <Card.Img
-        variant="top" // Positions image at the top of the card
-        src={imagePath}
-        alt={`Poster for ${movie.Title}`}
-        onError={handleImageError} // Fallback for broken images
-        className="card-img-top" // Class for aspect ratio/object-fit styling from index.scss
-      />
-      {/* Card body for content like title. */}
+    <Card className="h-100 movie-card shadow-sm">
+      <Link
+        to={`/movies/${encodeURIComponent(movie._id)}`}
+        style={{ textDecoration: "none", color: "inherit" }}
+      >
+        <Card.Img
+          variant="top"
+          src={imagePath}
+          alt={`Poster for ${movie.Title}`}
+          
+          className="card-img-top"
+        />
+      </Link>
       <Card.Body className="d-flex flex-column p-3">
-        {/* Movie title. text-truncate prevents overflow. h5 for semantics. */}
         <Card.Title className="text-truncate movie-card-title h5">
-          {movie.Title}
+          {/* Link the title as well for better UX */}
+          <Link
+            to={`/movies/${encodeURIComponent(movie._id)}`}
+            style={{ textDecoration: "none", color: "inherit" }}
+          >
+            {movie.Title}
+          </Link>
         </Card.Title>
+        {/* Actions: Open details and Add to Favorites */}
+        <div className="mt-auto d-flex justify-content-between align-items-center">
+          <Link to={`/movies/${encodeURIComponent(movie._id)}`}>
+            <Button variant="link" className="ps-0">
+              Open
+            </Button>
+          </Link>
+          {/* Placeholder Add to Favorites Button */}
+          <Button
+            variant="outline-success"
+            size="sm"
+            onClick={() => handleAddToFavorites(movie._id, movie.Title)}
+          >
+            ❤️ Favorite
+          </Button>
+        </div>
       </Card.Body>
     </Card>
   );
 };
 
-// Define prop types for validation and clarity.
 MovieCard.propTypes = {
   movie: PropTypes.shape({
     _id: PropTypes.string.isRequired,
     Title: PropTypes.string.isRequired,
-    ImagePath: PropTypes.string, // ImagePath is optional
+    ImagePath: PropTypes.string,
   }).isRequired,
-  onMovieClick: PropTypes.func.isRequired, // Callback function when card is clicked
 };
 
 /*
-This MovieCard component displays individual movie information in a card format.
-It utilizes React Bootstrap's Card components for a consistent and styled appearance.
-Key features include:
-- Displaying a movie poster (with a fallback if the image fails to load).
-- Showing the movie title, truncated if it's too long.
-- Making the entire card clickable to trigger the `onMovieClick` function (passed as a prop),
-  which typically navigates to a detailed view of the movie.
-- Applying Bootstrap utility classes like `h-100` for uniform card height in a grid,
-  `shadow-sm` for a subtle depth effect, and `p-3` for padding.
-- Custom classes like `.movie-card`, `.card-img-top`, and `.movie-card-title` allow for
-  specific styling overrides or additions via SCSS (primarily in `index.scss`).
+These comments intend to provide a self-learning feedback for me as a student
+to be able to revisit, review, and comprehend their gist whenever these type
+of scripts can be reused as a pattern again. I apologize for the inconveniences they might cause:
+
+MovieCard component renders a single movie summary card.
+
+1. Accepts a `movie` object prop with `_id`, `Title`, and optional `ImagePath`.  
+   → Lines 51–57
+
+2. Defines a placeholder `handleAddToFavorites` function simulating adding the movie to favorites (shows alert).  
+   → Lines 6–13
+
+3. Handles missing or broken movie images by replacing with a placeholder URL and alt text.  
+   → Lines 15–22
+
+4. Renders a Bootstrap Card:  
+   - Image wrapped in a React Router <Link> to the movie details page, with `onError` to handle image loading issues.  
+   - Title also wrapped in a <Link> for easier navigation.  
+   - Bottom area with two buttons side by side:  
+     • "Open" button linking to movie details page.  
+     • "❤️ Favorite" button that calls the placeholder favorite handler.  
+   - Uses flexbox for layout and spacing inside the card body.  
+   → Lines 24–49
+
+5. Uses PropTypes to enforce correct movie prop shape.  
+   → Lines 59–65
+
+Summary: This component provides a clickable movie card with navigation and a stub for favoriting functionality, using Bootstrap styling and React Router links to improve UX.
 */

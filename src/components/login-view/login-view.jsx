@@ -8,6 +8,7 @@ import Alert from "react-bootstrap/Alert";
 import "./login-view.scss";
 // Import the login API function.
 import { login } from "../../movies-api";
+import {Link} from "react-router-dom";
 
 export const LoginView = ({ onLoggedIn }) => {
   // State variables for form inputs, loading status, and error messages.
@@ -95,6 +96,8 @@ export const LoginView = ({ onLoggedIn }) => {
         >
           {isLoading ? "Logging in..." : "Login"}
         </Button>
+
+        <p>New to MoviesFlix? <Link to="/signup">Signup Now</Link></p>
       </Form>
     </div>
   );
@@ -106,13 +109,35 @@ LoginView.propTypes = {
 };
 
 /*
-This component renders the login form for the application.
-It uses React state to manage username, password, loading status, and error messages.
-React Bootstrap components (Form, Button, Alert) are used for structure and styling.
-The form submission calls an API to authenticate the user.
-On successful login, it calls the `onLoggedIn` callback function passed via props.
-Error messages are displayed using the Alert component.
-Custom styling is applied via `login-view.scss` and Bootstrap utility classes.
-The `.login-view-container` provides overall structure, and `.form-title` and `.submit-button`
-allow for specific styling of the heading and button respectively.
+These comments intend to provide a self-learning feedback for me as a student
+to be able to revisit, review, and comprehend their gist whenever these type
+of scripts can be reused as a pattern again. I apologize for the inconveniences they might cause:
+
+LoginView Component — user login form.
+
+Key points:
+
+1. Manages input states: username, password, loading, and error.  
+   → Lines 9–13
+
+2. Handles form submit with async `handleSubmit`:  
+   - Prevents default behavior.  
+   - Calls `login` API with credentials.  
+   - On success, calls `onLoggedIn` prop with user and token.  
+   - Shows errors via Alert if login fails or throws.  
+   → Lines 15–39
+
+3. Uses React Bootstrap Form, Button, and Alert for UI and feedback.  
+   → Lines 41–80
+
+4. Disables inputs and button during loading to prevent multiple submits.  
+   → Lines 59, 71, 78
+
+5. Custom styling via `login-view.scss` plus Bootstrap padding and layout classes.  
+   → Lines 41, 78 (container and button classes)
+
+6. PropTypes enforces required `onLoggedIn` function prop.  
+   → Lines 82–85
+
+This structure provides a responsive, user-friendly login experience with clean state management and error handling.
 */
