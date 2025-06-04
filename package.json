@@ -1,5 +1,5 @@
 {
-  "name": "moviemobs-client",
+  "name": "2.15.2",
   "version": "1.0.0",
   "description": "Frontend client for the MovieMobs application.",
   "homepage": "https://github.com/ivencomur/MovieMobs-client#readme",
@@ -32,7 +32,7 @@
   },
   "devDependencies": {
     "@parcel/transformer-sass": "^2.15.2",
-    "parcel": "^2.15.1",
-    "parcel-bundler": "^1.12.5"
-  }
+    "parcel": "^2.15.1"
+  },
+  "main": "index.js"
 }
