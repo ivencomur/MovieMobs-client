@@ -5,7 +5,7 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Alert from "react-bootstrap/Alert";
 // Import component-specific styles.
-import "./login-view.scss";
+// import "./login-view.scss";
 // Import the login API function.
 import { login } from "../../movies-api";
 import {Link} from "react-router-dom";

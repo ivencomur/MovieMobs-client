@@ -5,7 +5,7 @@ import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Alert from "react-bootstrap/Alert";
 // Import component-specific styles.
-import "./signup-view.scss";
+// import "./signup-view.scss";
 // Import API functions for signup and login.
 import { login, signupUser } from "../../movies-api";
 
