@@ -1,38 +1,31 @@
 {
-  "name": "2.15.2",
-  "version": "1.0.0",
-  "description": "Frontend client for the MovieMobs application.",
-  "homepage": "https://github.com/ivencomur/MovieMobs-client#readme",
-  "bugs": {
-    "url": "https://github.com/ivencomur/MovieMobs-client/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/ivencomur/MovieMobs-client.git"
-  },
-  "license": "ISC",
-  "author": "",
-  "type": "commonjs",
+  "name": "movies-client",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
   "scripts": {
-    "start": "parcel src/index.html",
-    "build": "parcel build src/index.html",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
   },
   "dependencies": {
-    "cors": "^2.8.5",
-    "prop-types": "^15.8.1",
     "react": "^19.1.0",
     "react-bootstrap": "^2.10.10",
     "react-dom": "^19.1.0",
-    "react-redux": "^9.2.0",
-    "react-router": "^6.30.1",
-    "react-router-dom": "^6.30.1",
-    "redux": "^5.0.1"
+    "react-router-dom": "^7.6.2"
   },
   "devDependencies": {
-    "@parcel/transformer-sass": "^2.9.3",
-    "bootstrap": "^5.3.6",
-    "parcel": "^2.9.3"
-  },
-  "main": "index.js"
+    "@eslint/js": "^9.25.0",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "@vitejs/plugin-react": "^4.4.1",
+    "eslint": "^9.25.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "globals": "^16.0.0",
+    "sass": "^1.89.1",
+    "sass-embedded": "^1.89.1",
+    "vite": "^6.3.5"
+  }
 }
